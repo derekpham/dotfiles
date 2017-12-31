@@ -98,6 +98,9 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias rm="rm -i"
+alias rm="rm -i -v"
+alias cp="cp -i -v"
+alias mv="mv -i -v"
 alias cdneu="cd ~/Desktop/Northeastern"
 alias clean="rm *~; rm .[!.]*~"
+alias ls="exa"
