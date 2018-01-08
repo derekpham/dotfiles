@@ -1,4 +1,4 @@
-echo "$(fortune -sa)\n"
+echo "$(fortune -sa)" | cowsay
 
 export TERM="xterm-256color"
 
@@ -106,6 +106,9 @@ alias rm="rm -i -v"
 alias cp="cp -i -v"
 alias mv="mv -i -v"
 alias cdneu="cd ~/Desktop/Northeastern"
-alias clean="rm *~; rm .[!.]*~"
+alias clean="rm *~; rm .[!.]*~; rm \#*\#"
 alias ls="exa"
 alias emac="emacs -nw"
+alias get="sudo apt-get install"
+alias update="sudo apt-get update"
+alias upgrade="sudo apt-get upgrade"
