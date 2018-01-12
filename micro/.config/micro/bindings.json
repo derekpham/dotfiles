@@ -3,10 +3,9 @@
 	"CtrlN": "CursorDown",
 	"CtrlF": "CursorRight",
 	"CtrlB": "CursorLeft",
-	"AltF" : "WordRight",
-	"AltB" : "WordLeft",
 	"CtrlA": "StartOfLine",
 	"CtrlE": "EndOfLine",
-	"CtrlS": "Find",
-	"CtrlT" : "Save",
+	"CtrlV": "CursorPageDown",
+	"CtrlY": "Paste",
+	"CtrlW": "Cut"
 }
