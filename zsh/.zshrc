@@ -1,4 +1,4 @@
-echo "$(fortune -sa)" | cowsay
+echo "$(fortune -sa)" | cowsay -f tux
 
 [ -z "$TMUX" ] && export TERM=xterm-256color
 
