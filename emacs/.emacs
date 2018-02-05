@@ -1,5 +1,5 @@
 (require 'package)
-(add-to-list 'load-path "~/.emacs.d/")
+;;(add-to-list 'load-path "~/.emacs.d/")
 
 (setq c-default-style "linux")
 (setq line-number-mode t)

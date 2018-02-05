@@ -3,7 +3,7 @@ echo "$(fortune -sa)" | cowsay -f tux
 [ -z "$TMUX" ] && export TERM=xterm-256color
 
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH=/home/derek/.oh-my-zsh
@@ -11,6 +11,7 @@ export ZSH=/home/derek/.oh-my-zsh
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+
 ZSH_THEME="powerlevel9k/powerlevel9k"
 
 # Set list of themes to load
@@ -109,6 +110,5 @@ alias cdneu="cd ~/Desktop/Northeastern"
 alias clean="rm *~; rm .[!.]*~; rm \#*\#"
 alias ls="exa"
 alias emac="emacs -nw"
-alias get="sudo apt-get install"
-alias update="sudo apt-get update"
-alias upgrade="sudo apt-get upgrade"
+alias get="sudo pacman -S"
+alias remove="sudo pacman -R"
