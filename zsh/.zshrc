@@ -77,8 +77,6 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
@@ -95,20 +93,5 @@ source $ZSH/oh-my-zsh.sh
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-alias rm="rm -i -v"
-alias cp="cp -i -v"
-alias mv="mv -i -v"
-alias cdneu="cd ~/Desktop/Northeastern"
-alias clean="rm *~; rm .[!.]*~; rm \#*\#"
-alias ls="exa"
-alias emac="emacs -nw"
-alias get="sudo pacman -S"
-alias remove="sudo pacman -R"
+source $HOME/.aliases
+source $HOME/.env

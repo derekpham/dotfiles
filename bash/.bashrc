@@ -1,3 +1,7 @@
-alias rm="rm -i"
-alias cdneu="cd ~/Desktop/Northeastern"
-alias clean="rm *~ .[!.]*~"
+if [ -f ~/.aliases]; then
+    source ~/.aliases
+fi
+
+if [ -f ~/.env]; then
+    source ~/.env
+fi
