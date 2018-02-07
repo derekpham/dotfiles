@@ -2,6 +2,7 @@
 alias rm="rm -iv"
 alias cp="cp -iv"
 alias mv="mv -iv"
+alias rmdir="rmdir -iv"
 alias ls="exa"
 alias mkdir="mkdir -pv"
 alias chown="chown -Rv"
