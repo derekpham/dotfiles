@@ -31,8 +31,6 @@ rofi.kb-row-left:		Alt+v
 rofi.kb-row-right:		Control+v
 rofi.kb-row-up:			Control+p
 rofi.kb-row-down:		Control+n
-rofi.kb-row-first:		Alt+a
-rofi.kb-row-last:		Alt+e
 rofi.kb-row-select:		Control+space
 rofi.kb-screenshot:		Alt+s
 rofi.kb-cancel:			Escape,Control+g
