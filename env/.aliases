@@ -12,10 +12,10 @@ alias chmod="chmod -Rv"
 alias emac="emacs -nw"
 
 # Convenience
-alias clean="rm *~; rm .[!.]*~; rm \#*\#" #TODO: make this better
 alias cdneu="cd ~/Desktop/Northeastern"
 
 # pacman
 alias get="sudo pacman -S"
 alias remove="sudo pacman -R"
 alias upgrade="sudo pacman -Syu"
+alias pkgsearch="pacman -Ss"

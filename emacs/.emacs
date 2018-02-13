@@ -6,32 +6,25 @@
 (setq column-number-mode t)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'write-file-functions 'delete-trailing-whitespace)
-(defun load-food-file (a)
-  "load the list of food that should be there every day"
-  (interactive "p")
-  (find-file "/home/derek/Desktop/Northeastern/Things"))
 (defun open-msdata (a)
   "load the data of minesweeper"
   (interactive "p")
   (find-file "~/.local/share/gnome-mines/history"))
-(defun resume (a)
-  "load the resume.tex and open the terminal in the other window"
-  (interactive "p")
-  (split-window-right)
-  (find-file "~/Desktop/Northeastern/resume/resume.tex")
-  (other-window 1)
-  (term "/bin/bash")
-  (insert "cd ~/Desktop/Northeastern\n"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes (quote (solarized-dark)))
+ '(custom-safe-themes
+   (quote
+    ("a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "bfdcbf0d33f3376a956707e746d10f3ef2d8d9caa1c214361c9c08f00a1c8409" default)))
  '(inhibit-startup-screen t)
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa-stable" . "http://stable.melpa.org/packages/")))))
+     ("melpa-stable" . "http://stable.melpa.org/packages/"))))
+ '(package-selected-packages (quote (haskell-mode solarized-theme zenburn-theme))))
 (package-initialize)
 
 (custom-set-faces
@@ -73,3 +66,4 @@
                 (setq indent-tabs-mode t)
                 (setq show-trailing-whitespace t)
                 (c-set-style "linux-tabs-only")))))
+(load-theme 'solarized-dark t)

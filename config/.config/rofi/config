@@ -1,3 +1,5 @@
+rofi.modi:			run,window,ssh,keys,combi
+rofi.combi-modi:		window,run
 rofi.theme:			/usr/share/rofi/themes/glue_pro_blue.rasi
 rofi.width:			50
 rofi.lines:			20
@@ -7,9 +9,9 @@ rofi.bw:			1
 rofi.location:			0 # center
 rofi.padding:			5
 rofi.show-icons:		false
-rofi.combi-modi:		window,run
 
 # key bindings
+rofi.kb-row-tab:		Control+Tab
 rofi.kb-primary-paste:		Control+Y
 rofi.kb-secondary-paste:	Control+y
 rofi.kb-clear-line:		Control+w
@@ -25,7 +27,7 @@ rofi.kb-remove-char-forward:	Delete,Control+d
 rofi.kb-remove-char-back:	BackSpace
 rofi.kb-remove-to-eol:		Control+k
 rofi.kb-accept-custom:		Control+Return
-rofi.kb-mode-next:		Shift+Right,Control+Tab
+rofi.kb-mode-next:		Shift+Right,Tab
 rofi.kb-mode-previous:		Shift+Left
 rofi.kb-row-left:		Alt+v
 rofi.kb-row-right:		Control+v
