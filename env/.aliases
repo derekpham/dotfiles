@@ -19,3 +19,6 @@ alias get="sudo pacman -S"
 alias remove="sudo pacman -R"
 alias upgrade="sudo pacman -Syu"
 alias pkgsearch="pacman -Ss"
+
+# python -- for now
+alias python="python2"

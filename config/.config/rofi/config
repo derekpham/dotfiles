@@ -19,8 +19,8 @@ rofi.kb-move-front:		Control+a
 rofi.kb-move-end:		Control+e
 rofi.kb-move-word-back:		Alt+b
 rofi.kb-move-word-forward:	Alt+f
-rofi.kb-move-char-back:		Control+b
-rofi.kb-move-char-forward:	Control+f
+rofi.kb-move-char-back:		Control+b,Left
+rofi.kb-move-char-forward:	Control+f,Right
 rofi.kb-remove-word-back:	Alt+BackSpace,Control+BackSpace
 rofi.kb-remove-word-forward:	Alt+d
 rofi.kb-remove-char-forward:	Delete,Control+d
@@ -31,8 +31,8 @@ rofi.kb-mode-next:		Shift+Right,Tab
 rofi.kb-mode-previous:		Shift+Left
 rofi.kb-row-left:		Alt+v
 rofi.kb-row-right:		Control+v
-rofi.kb-row-up:			Control+p
-rofi.kb-row-down:		Control+n
+rofi.kb-row-up:			Control+p,Up
+rofi.kb-row-down:		Control+n,Down
 rofi.kb-row-select:		Control+space
 rofi.kb-screenshot:		Alt+s
 rofi.kb-cancel:			Escape,Control+g
