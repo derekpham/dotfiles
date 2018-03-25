@@ -1,5 +1,5 @@
-rofi.modi:			run,window,ssh,keys,combi
-rofi.combi-modi:		window,run
+rofi.modi:			run
+rofi.combi-modi:		run,reddit
 rofi.theme:			/usr/share/rofi/themes/glue_pro_blue.rasi
 rofi.width:			50
 rofi.lines:			20
