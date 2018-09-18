@@ -4,6 +4,8 @@ HISTORY_FILE_NAME='history';
 
 HISTORY_ABS_PATH=$REDDIT_DIR/$HISTORY_FILE_NAME
 
+BROWSER = firefox
+
 if [[ ! (-f $HISTORY_ABS_PATH) ]]
 then
     touch $HISTORY_ABS_PATH;
@@ -13,7 +15,7 @@ if [ -z $@ ]
 then
     sort $HISTORY_ABS_PATH | uniq -c | sort -rn | sed 's/[[:space:]]*[[:digit:]]*[[:space:]]//';
 else
-    xdg-open $REDDIT_URL$@;
+    $BROWSER $REDDIT_URL$@;
     echo $@ >> $HISTORY_ABS_PATH;
 fi
 

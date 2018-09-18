@@ -16,9 +16,13 @@ alias cdneu="cd ~/Desktop/Northeastern"
 
 # pacman
 alias get="sudo pacman -S"
-alias remove="sudo pacman -R"
+alias remove="sudo pacman -Rs"
 alias upgrade="sudo pacman -Syu"
 alias pkgsearch="pacman -Ss"
 
 # python -- for now
 alias python="python2"
+
+# school
+alias nucal="xdg-open ~/Public/nucal.pdf"
+alias nusched="xdg-open ~/Public/nusched.png"

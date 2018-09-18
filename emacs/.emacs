@@ -24,7 +24,9 @@
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa-stable" . "http://stable.melpa.org/packages/"))))
- '(package-selected-packages (quote (haskell-mode solarized-theme zenburn-theme))))
+ '(package-selected-packages
+   (quote
+    (go-mode haskell-mode solarized-theme zenburn-theme))))
 (package-initialize)
 
 (custom-set-faces
