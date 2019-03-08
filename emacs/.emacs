@@ -69,3 +69,6 @@
                 (setq show-trailing-whitespace t)
                 (c-set-style "linux-tabs-only")))))
 (load-theme 'solarized-dark t)
+
+(setq backup-directory-alist `(("." . "~/emacs-backup-files")))
+(setq backup-by-copying t)
