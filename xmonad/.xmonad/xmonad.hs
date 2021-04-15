@@ -49,7 +49,6 @@ downGap = 0
 upGap = 25
 myLayoutHook = avoidStruts $
                gaps [(U,upGap),(L,leftGap),(R,rightGap),(D,downGap)] $
-               spacing 5 $
                layoutHook xfceConfig
 
 myWorkspaces = [show x | x <- [1..9]]

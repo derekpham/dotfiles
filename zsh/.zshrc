@@ -2,12 +2,13 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH=/home/derek/.oh-my-zsh
+POWERLEVEL9K_MODE="awesome-patched"
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
@@ -66,6 +67,7 @@ plugins=(
 	django
 	pip
 	python
+        zsh-autosuggestions
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -88,6 +90,13 @@ source $ZSH/oh-my-zsh.sh
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
+
 source $HOME/.aliases
 source $HOME/.env
 source /usr/share/doc/pkgfile/command-not-found.zsh
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
