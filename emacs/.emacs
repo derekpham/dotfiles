@@ -3,6 +3,9 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
 ;; remove crap
 (menu-bar-mode -1)
 (when (fboundp 'tool-bar-mode)
@@ -44,7 +47,7 @@
 (save-place-mode 1)
 
 (require 'ace-window)
-(global-set-key (kbd "M-o") 'ace-window)
+(global-set-key (kbd "C-x o") 'ace-window)
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
 (defvar aw-dispatch-alist
   '((?x aw-delete-window "Delete Window")
@@ -82,7 +85,7 @@
    '("0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "bfdcbf0d33f3376a956707e746d10f3ef2d8d9caa1c214361c9c08f00a1c8409" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(ace-window use-package zenburn-theme uniquify-files solarized-theme rust-mode haskell-mode go-mode company)))
+   '(projectile ace-window use-package zenburn-theme uniquify-files solarized-theme rust-mode haskell-mode go-mode company)))
 (package-initialize)
 
 
