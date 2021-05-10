@@ -10,10 +10,22 @@
 (require 'use-package)
 
 (use-package projectile
+  :ensure t
+
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :config
+
   (projectile-mode + 1))
+
+(use-package org
+  :ensure t
+
+  :config
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+
+  (setq org-log-done t))
 
 ;; The uniquify library makes it so that when you visit two files with
 ;; the same name in different directories, the buffer names have
@@ -23,8 +35,11 @@
   (setq uniquify-buffer-name-style 'forward))
 
 (use-package ace-window
+  :ensure t
+
   :bind
   ("C-x o" . ace-window)
+
   :config
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   (defvar aw-dispatch-alist
@@ -43,7 +58,10 @@
     "List of actions for `aw-dispatch-default'."))
 
 (use-package company
+  :ensure t
+
   :diminish company-mode
+
   :config
   (global-company-mode 1)
   (add-to-list 'company-backends '(company-capf :with company-dabbrev)))
