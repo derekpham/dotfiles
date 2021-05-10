@@ -25,7 +25,15 @@
   (define-key global-map "\C-cl" 'org-store-link)
   (define-key global-map "\C-ca" 'org-agenda)
 
-  (setq org-log-done t))
+  (setq org-log-done t)
+  (setq org-agenda-files (list "~/org/todo.org"))
+  (add-hook 'org-mode-hook #'visual-line-mode))
+
+(use-package org-bullets
+  :ensure t
+
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;; The uniquify library makes it so that when you visit two files with
 ;; the same name in different directories, the buffer names have
@@ -122,3 +130,9 @@
  '(package-selected-packages
    '(magit projectile ace-window use-package zenburn-theme uniquify-files solarized-theme rust-mode haskell-mode go-mode company)))
 (package-initialize)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
