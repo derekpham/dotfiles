@@ -74,7 +74,10 @@
   (global-company-mode 1)
   (add-to-list 'company-backends '(company-capf :with company-dabbrev)))
 
-(use-package magit)
+(use-package magit
+  :ensure t)
+(use-package solarized-theme
+  :ensure t)
 
 ;; remove crap
 (menu-bar-mode -1)
@@ -125,7 +128,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(solarized-dark))
  '(custom-safe-themes
-   '("0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "bfdcbf0d33f3376a956707e746d10f3ef2d8d9caa1c214361c9c08f00a1c8409" default))
+   '("fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "bfdcbf0d33f3376a956707e746d10f3ef2d8d9caa1c214361c9c08f00a1c8409" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
    '(magit projectile ace-window use-package zenburn-theme uniquify-files solarized-theme rust-mode haskell-mode go-mode company)))
