@@ -1,3 +1,10 @@
+: '
+Might need to download zsh syntax highlighting https://github.com/zsh-users/zsh-syntax-highlighting
+powerlevel10k: https://github.com/romkatv/powerlevel10k
+fuzzy finder: https://github.com/junegunn/fzf
+Might need to install command-not-found?
+'
+
 [ -z "$TMUX" ] && export TERM=xterm-256color
 
 # Path to your oh-my-zsh installation.
@@ -64,7 +71,6 @@ plugins=(
 	cabal
 	chucknorris
 	command-not-found
-	django
 	pip
 	python
         zsh-autosuggestions
@@ -93,10 +99,34 @@ source $ZSH/oh-my-zsh.sh
 
 source $HOME/.aliases
 source $HOME/.env
-source /usr/share/doc/pkgfile/command-not-found.zsh
+source $HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+HB_CNF_HANDLER="$(brew --repository)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+if [ -f "$HB_CNF_HANDLER" ]; then
+source "$HB_CNF_HANDLER";
+fi
+
+reload_ssh_keys () {
+    ssh-add -D
+
+    ssh-add --apple-use-keychain ~/.ssh/derekpham67_github_ssh_key
+    ssh-add --apple-use-keychain ~/.ssh/${USER}_at_linkedin.com_ssh_key
+}
+
+reload_ssh_keys;
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
+# $HOME/.cargo/bin is added to user PATH by MDM
+case ":${PATH}:" in
+    *:"$HOME/.cargo/bin":*)
+    ;;
+    *)
+    export PATH="$PATH:$HOME/.cargo/bin"
+    ;;
+esac
