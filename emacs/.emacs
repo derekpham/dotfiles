@@ -29,6 +29,29 @@
   (setq org-agenda-files (list "~/org/todo.org"))
   (add-hook 'org-mode-hook #'visual-line-mode))
 
+(use-package lsp-mode
+  :ensure t
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (XXX-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+(use-package go-mode
+  :ensure t
+
+  :config
+  (add-hook 'go-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook 'gofmt-before-save)
+              (setq tab-width 4)
+              (setq indent-tabs-mode 1))))
+
 (use-package org-bullets
   :ensure t
 
@@ -71,6 +94,7 @@
   :diminish company-mode
 
   :config
+  (setq company-minimum-prefix-length 1)
   (global-company-mode 1)
   (add-to-list 'company-backends '(company-capf :with company-dabbrev)))
 
@@ -131,7 +155,7 @@
    '("fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "bfdcbf0d33f3376a956707e746d10f3ef2d8d9caa1c214361c9c08f00a1c8409" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(magit projectile ace-window use-package zenburn-theme uniquify-files solarized-theme rust-mode haskell-mode go-mode company)))
+   '(lsp-treemacs lsp-ui magit projectile ace-window use-package zenburn-theme uniquify-files solarized-theme rust-mode haskell-mode go-mode company)))
 (package-initialize)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
