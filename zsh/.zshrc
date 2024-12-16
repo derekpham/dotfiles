@@ -1,3 +1,6 @@
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+
 : '
 Might need to download zsh syntax highlighting https://github.com/zsh-users/zsh-syntax-highlighting
 powerlevel10k: https://github.com/romkatv/powerlevel10k
@@ -69,7 +72,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 plugins=(
 	git
 	cabal
-	chucknorris
 	command-not-found
 	pip
 	python
@@ -111,24 +113,3 @@ HB_CNF_HANDLER="$(brew --repository)/Library/Taps/homebrew/homebrew-command-not-
 if [ -f "$HB_CNF_HANDLER" ]; then
 source "$HB_CNF_HANDLER";
 fi
-
-reload_ssh_keys () {
-    ssh-add -D
-
-    ssh-add --apple-use-keychain ~/.ssh/derekpham67_github_ssh_key
-    ssh-add --apple-use-keychain ~/.ssh/${USER}_at_linkedin.com_ssh_key
-}
-
-reload_ssh_keys;
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-export GOPATH="$(go env GOPATH)"
-export PATH="${PATH}:${GOPATH}/bin"
-# $HOME/.cargo/bin is added to user PATH by MDM
-case ":${PATH}:" in
-    *:"$HOME/.cargo/bin":*)
-    ;;
-    *)
-    export PATH="$PATH:$HOME/.cargo/bin"
-    ;;
-esac
