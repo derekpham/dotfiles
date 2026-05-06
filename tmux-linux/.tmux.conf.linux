@@ -1,0 +1,100 @@
+set -g history-file ~/.tmux_history
+
+set-option -g default-command 'bash'
+
+######################### GENERAL
+set -g history-limit 10000
+set-window-option -g automatic-rename off
+
+
+######################### COLORS
+set -g default-terminal "screen-256color"
+
+# status bar colors
+set -g status-fg green
+set -g status-bg colour233
+
+# window status colors
+set -g window-status-style bg=default,fg=cyan,dim
+set -g window-status-current-style fg=yellow,bg=red,bright
+
+# pane divider colors
+set -g pane-border-style fg=green,bg=black
+set -g pane-active-border-style fg=white,bg=yellow
+
+# message colors
+set -g message-style fg=white,bg=black,bright
+
+
+######################### COPY MODE
+# Enter copy mode:          prefix + [
+# Move:                     h j k l  (or arrows)
+# Start selection:          v
+# Rectangle toggle:         C-v
+# Yank to system clipboard: y  (or Enter)
+# Quit copy mode:           q
+#
+# Uses xclip on Linux (install with: apt install xclip  OR  dnf install xclip).
+# If running under Wayland, replace "xclip -selection clipboard -i" with "wl-copy".
+setw -g mode-keys vi
+unbind -T copy-mode-vi Enter
+bind-key -T copy-mode-vi v     send-keys -X begin-selection
+bind-key -T copy-mode-vi C-v   send-keys -X rectangle-toggle
+bind-key -T copy-mode-vi y     send-keys -X copy-pipe-and-cancel "xclip -selection clipboard -i"
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "xclip -selection clipboard -i"
+
+# Paste from tmux buffer: prefix + p
+unbind p
+bind p paste-buffer
+
+
+######################### STATUS BAR
+set-option -g status on
+set -gq status-utf8 on
+set -g display-time 1000
+# automaticaly renumber windows when close one
+set -g renumber-windows on
+set-option -g status-interval 5
+set -g status-justify centre
+# left status bar
+set -g status-left-length 70
+set -g status-left "#[fg=green]Session:#S #[fg=yellow]Window:#I #[fg=cyan]Pane:#P"
+# right status bar
+set -g status-right "#[fg=cyan]%R   %a, %b %d %G "
+
+
+######################### APPEARANCE
+set -g focus-events on
+setw -g monitor-activity on
+set -g visual-activity on
+
+
+######################### KEY BINDINGS
+set -sg escape-time 0
+set -sg repeat-time 1000
+# prefix
+unbind C-b
+set-option -g prefix C-o
+bind-key C-o send-prefix
+
+# reload
+bind C-r source-file ~/.tmux.conf
+
+# resizing
+bind -r C-i resize-pane -U 2
+bind -r C-k resize-pane -D 2
+bind -r C-j resize-pane -L 2
+bind -r C-l resize-pane -R 2
+
+# cycling panes
+bind -r C-n select-window -t :-
+bind -r C-p select-window -t :+
+
+# split panes
+bind | split-window -h
+bind - split-window -v
+unbind '"'
+unbind %
+
+unbind-key -n M-b
+unbind-key -n M-f
