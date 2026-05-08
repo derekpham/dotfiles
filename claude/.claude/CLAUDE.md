@@ -6,8 +6,9 @@
 
 For any new session where the user asks to write code:
 
-1. Enter a new worktree via `EnterWorktree` before making changes.
-2. Delegate the implementation to the `code-writer` agent.
-3. Before pushing, run PR review agents (`pr-correctness` and `pr-architecture`) on the changes.
+1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
+2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
+3. Delegate the implementation to the `code-writer` agent.
+4. Before pushing, run PR review agents (`pr-correctness` and `pr-architecture`) on the changes.
 
 Skip the worktree step only if the user explicitly overrides for a given task. Do not trigger for research, questions, or read-only exploration.
