@@ -92,6 +92,7 @@ If a section is empty, write "None." under it. Never pad with filler.
 - No `if`/`else` inside a test body to pick different assertions for different inputs. The only acceptable branch is `if err != nil` vs the success path. Cases that need different assertion shapes belong in a separate `t.Run(...)` or a separate test function, not smuggled into one case via conditionals.
 - No loops inside a test body other than the outer `for _, tc := range tests` of a table-driven test. Iteration inside a single case hides what's actually being asserted.
 - Prefer table-driven / parameterized tests when cases share the same arrange/act/assert shape. If a case doesn't fit the table cleanly, write a sibling `t.Run("descriptive name", func(t *testing.T) { ... })` rather than contorting the table. Reason: tests exist to catch behavior regressions; branching and loops inside a test make the behavior under test ambiguous.
+- Prefer `assert.ErrorIs` / `assert.ErrorAs` (or `errors.Is` / `errors.As`) over `assert.Contains(err.Error(), "...")` when asserting on errors. String-matching couples the test to the exact wording of the error message — rewording a `fmt.Errorf` then breaks unrelated tests. Substring matching is acceptable only when the production code returns a freshly-constructed `fmt.Errorf` with no wrapping or sentinel and adding one purely for the test would distort the production code.
 
 **Prefer standard library over hand-rolled**
 - Use `min(a, b)` / `max(a, b)` (Go 1.21+ builtins) instead of if/else comparisons

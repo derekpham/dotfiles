@@ -92,6 +92,11 @@ The table body should be a single straight line of logic per case — no branchi
 
 **Go specifically:** if a case doesn't fit the table cleanly, write a separate `t.Run("descriptive name", func(t *testing.T) { ... })` alongside the table loop. Don't contort the table to fit it.
 
+### Assert on error type, not message text
+Prefer `errors.Is` / `errors.As` (or your language's equivalent) over substring matching on `err.Error()`. String-matching couples the test to the exact wording of an error message; rewording a `fmt.Errorf` then breaks unrelated tests. Type/sentinel assertions survive any rewording as long as the wrapped error is unchanged.
+
+Reach for substring matching only when the type assertion would be contrived — e.g. the production code returns a freshly-constructed `fmt.Errorf` with no wrapping and no sentinel, and introducing one purely for the test would distort the production code.
+
 ### Coverage
 - Cover the happy path, the main error paths, and any boundary that can realistically break (empty input, nil, zero, max, off-by-one).
 - Don't chase 100% coverage by testing trivial getters or generated code.
