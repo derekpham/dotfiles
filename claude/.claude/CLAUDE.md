@@ -16,6 +16,10 @@ If `0` / `""` / `nil` is meant as "use the default," use `*T`, an options struct
 
 Exception: trust boundaries (user input, network APIs, parsing untrusted data). Validation there is legitimate.
 
+## No `ctrl.Finish()` in Go gomock tests
+
+Don't write `defer ctrl.Finish()` after `gomock.NewController(t)`. Since gomock v1.5.0, the controller registers its own cleanup via `t.Cleanup`, so the explicit `Finish` is redundant. Just write `ctrl := gomock.NewController(t)` and move on.
+
 ## Coding workflow (Roblox projects only)
 
 **Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos.

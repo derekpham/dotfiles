@@ -92,6 +92,9 @@ The table body should be a single straight line of logic per case — no branchi
 
 **Go specifically:** if a case doesn't fit the table cleanly, write a separate `t.Run("descriptive name", func(t *testing.T) { ... })` alongside the table loop. Don't contort the table to fit it.
 
+### No `ctrl.Finish()` in Go gomock tests
+Don't write `defer ctrl.Finish()` after `gomock.NewController(t)`. Since gomock v1.5.0 the controller registers its own cleanup via `t.Cleanup`, so the explicit `Finish` is redundant. Just write `ctrl := gomock.NewController(t)` and move on.
+
 ### Assert on error type, not message text
 Prefer `errors.Is` / `errors.As` (or your language's equivalent) over substring matching on `err.Error()`. String-matching couples the test to the exact wording of an error message; rewording a `fmt.Errorf` then breaks unrelated tests. Type/sentinel assertions survive any rewording as long as the wrapped error is unchanged.
 
