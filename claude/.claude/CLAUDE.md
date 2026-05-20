@@ -43,3 +43,11 @@ Before drafting the PR, you **must** ask the human why this change is necessary 
 The PR title **must** be a brief summary of both the *why* and the *how* of the PR — not just one or the other. Like the `## Why` section, the title's motivation half should come from the human's answer, not inferred from the diff.
 
 The standard `## Summary` and `## Test plan` sections are typically useless: they reiterate implementation details the reviewer can read from the diff. Keep them minimal or omit them unless they add information the diff doesn't already convey (e.g. a manual test that ran outside CI, a non-obvious behavior change). The `## Why` is the section that earns its space.
+
+## PR reviews
+
+When reviewing a PR (yours or someone else's), in addition to the diff itself:
+
+1. Review the PR **title and body description**. Does the body explain *why* the change is necessary (not just what it does)? If the `## Why` is missing, vague, or only restates the diff, flag that as a review comment.
+2. After collecting all review findings (diff issues + missing/weak `## Why`), present them to the human and **confirm which comments to actually post** to GitHub before pushing anything. Do not auto-post.
+3. Every comment you generate **must** start with the literal prefix `from Derek's PR Review Agent: ` so it is clearly attributed.
