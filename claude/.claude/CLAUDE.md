@@ -30,5 +30,16 @@ For any new session where the user asks to write code:
 2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
 3. Delegate the implementation to the `code-writer` agent.
 4. Before pushing, run PR review agents (`pr-correctness` and `pr-architecture`) on the changes.
+5. When opening a PR, always create it as a draft (`gh pr create --draft`). Do not ask for permission to draft — just draft it. The user will mark it ready for review themselves.
 
 Skip the worktree step only if the user explicitly overrides for a given task. Do not trigger for research, questions, or read-only exploration.
+
+## PR descriptions
+
+Whenever drafting or opening a PR, the description **must** begin with a `## Why` section that explains the motivation for the change.
+
+Before drafting the PR, you **must** ask the human why this change is necessary — do not infer it from the diff or commit messages. Wait for their answer, then write the `## Why` section in their words.
+
+The PR title **must** be a brief summary of both the *why* and the *how* of the PR — not just one or the other. Like the `## Why` section, the title's motivation half should come from the human's answer, not inferred from the diff.
+
+The standard `## Summary` and `## Test plan` sections are typically useless: they reiterate implementation details the reviewer can read from the diff. Keep them minimal or omit them unless they add information the diff doesn't already convey (e.g. a manual test that ran outside CI, a non-obvious behavior change). The `## Why` is the section that earns its space.
