@@ -24,12 +24,18 @@ The title must summarize **both the why and the how** in under ~70 characters. T
 
 ## 3. Body
 
-The body **must** begin with `## Why`. Use the user's words, not your paraphrase.
+The body **must** begin with `## Why`, followed by a brief `## How`.
 
 ```markdown
 ## Why
 <the user's motivation, in their words>
+
+## How
+<1–3 bullets or a short paragraph summarizing the approach>
 ```
+
+- **`## Why`** — use the user's words from step 1, not your paraphrase.
+- **`## How`** — a brief summary of the *approach*, not a line-by-line restatement of the diff. Enough that a reviewer knows what to expect before they open the file tree (e.g. "Replace the recursive walk with `fs.WalkDir`; drop the manual symlink loop since `WalkDir` handles it"). Keep it tight — if you're describing every file you touched, you're rewriting the diff.
 
 Skip `## Summary` and `## Test plan` unless they add information the diff doesn't already convey:
 
@@ -37,7 +43,7 @@ Skip `## Summary` and `## Test plan` unless they add information the diff doesn'
 - A non-obvious behavior change a reviewer would miss from the diff alone.
 - A follow-up that's intentionally out of scope.
 
-If they don't add anything, omit them. The `## Why` is the section that earns its space.
+If they don't add anything, omit them. The `## Why` and `## How` are the sections that earn their space.
 
 ## 4. Always create as a draft
 
@@ -48,6 +54,9 @@ Pass the body via heredoc to preserve formatting:
 ```bash
 gh pr create --draft --title "…" --body "$(cat <<'EOF'
 ## Why
+…
+
+## How
 …
 EOF
 )"
