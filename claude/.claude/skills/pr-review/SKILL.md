@@ -39,24 +39,32 @@ from Derek's PR Review Agent:
 
 …so it's clearly attributed when posted.
 
+**All comments must be inline (pinpointed to specific code lines).** Do not post general PR-level comments. Every finding — including the missing `## Why` flag — must be tied to a file and line number.
+
+If the PR is missing a `## Why` section, post that comment as an inline comment on the **first changed line** of the diff (first file, first hunk, first `+` line).
+
 ## 5. Confirm before posting — never auto-post
 
-Show the candidate comments to the user and ask which ones to actually post. Present them as a numbered list and ask the user to pick (or use `AskUserQuestion` if the set is small).
+Show the candidate comments to the user and ask which ones to actually post. Present them as a numbered list. For each comment, include:
+
+- The **file path and line number** where it will be posted.
+- A **code snippet** showing the relevant lines (a few lines of context around the target line).
+- The **comment text** that will be posted.
+
+This lets the user see exactly where each comment lands before approving.
 
 Do **not** post anything until the user has explicitly confirmed which comments to include. "Looks good" or "review the PR" earlier in the conversation does **not** count as approval to post — this gate is mandatory every time.
 
 ## 6. Post the approved comments
 
-After confirmation, post via:
-
-- `gh pr review --comment --body "…"` for general PR-level comments.
-- `gh pr review --request-changes` / `--approve` only if the user explicitly confirmed the verdict.
-- `gh api repos/{owner}/{repo}/pulls/{number}/comments` for inline line comments tied to specific lines:
+After confirmation, post all comments as **inline comments** pinpointed to specific lines:
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{number}/comments \
   -f body="from Derek's PR Review Agent: …" \
   -f commit_id=<sha> -f path=<file> -F line=<n> -f side=RIGHT
 ```
+
+- `gh pr review --request-changes` / `--approve` only if the user explicitly confirmed the verdict.
 
 Return links to the posted comments.
