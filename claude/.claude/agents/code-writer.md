@@ -90,6 +90,8 @@ When several cases share the same arrange/act/assert shape, use one test with a 
 
 The table body should be a single straight line of logic per case — no branching on `tc.name`, no special-cased rows. If a case needs fundamentally different setup or assertions, lift it out into its own test instead of shoehorning it into the table.
 
+When tests share the same assertion but differ in mock/fixture setup, use a `setupMocks func(...)` field in the table struct rather than writing separate test functions. Group tests by expected outcome (e.g. "returns error", "succeeds with metric=1", "no-ops") and parameterize within each group.
+
 **Go specifically:** if a case doesn't fit the table cleanly, write a separate `t.Run("descriptive name", func(t *testing.T) { ... })` alongside the table loop. Don't contort the table to fit it.
 
 ### No `ctrl.Finish()` in Go gomock tests
