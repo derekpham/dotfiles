@@ -19,7 +19,16 @@ In a single message with two `Agent` tool calls, invoke:
 
 Run them in parallel; they're independent. Each subagent reads the diff itself; you don't need to pre-summarize it.
 
-## 3. Check the `## Why` yourself
+## 3. Summarize the change for Derek
+
+After the subagents finish, write a short summary (3–6 sentences) covering:
+
+- **What** the change does (the observable behavior or outcome).
+- **How** it achieves it (key implementation approach — new files, modified paths, patterns used).
+
+Present this summary to the user before the list of findings so he can orient himself in the diff quickly. Keep it factual — no opinions or recommendations here.
+
+## 4. Check the `## Why` yourself
 
 Separately, read the PR title and body via `gh pr view <pr>`. Ask:
 
@@ -29,7 +38,7 @@ Separately, read the PR title and body via `gh pr view <pr>`. Ask:
 
 If any of those fail, that's a finding — flag it as a review comment alongside the subagent findings.
 
-## 4. Aggregate findings, prefix every comment
+## 5. Aggregate findings, prefix every comment
 
 Combine the two subagent outputs and the `## Why` check into a single list of candidate comments. **Every** candidate comment must start with the literal prefix:
 
@@ -43,7 +52,7 @@ from Derek's PR Review Agent:
 
 If the PR is missing a `## Why` section, post that comment as an inline comment on the **first changed line** of the diff (first file, first hunk, first `+` line).
 
-## 5. Confirm before posting — never auto-post
+## 6. Confirm before posting — never auto-post
 
 Show the candidate comments to the user and ask which ones to actually post. Present them as a numbered list. For each comment, include:
 
@@ -55,7 +64,7 @@ This lets the user see exactly where each comment lands before approving.
 
 Do **not** post anything until the user has explicitly confirmed which comments to include. "Looks good" or "review the PR" earlier in the conversation does **not** count as approval to post — this gate is mandatory every time.
 
-## 6. Post the approved comments
+## 7. Post the approved comments
 
 After confirmation, post all comments as **inline comments** pinpointed to specific lines:
 
