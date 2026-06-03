@@ -30,7 +30,8 @@ For any new session where the user asks to write code:
 2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
 3. Delegate the implementation to the `code-writer` agent.
 4. Before pushing, run the `pr-correctness` and `pr-architecture` subagents on the changes as a self-review.
-5. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft.
+5. Before creating the PR, ask the user for a Jira ticket number (e.g. `PROJ-123`). If there is no ticket, use `ADHOC`. Include the ticket in the PR title as a prefix (e.g. `PROJ-123: Add retry logic`).
+6. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft.
 
 Skip the worktree step only if the user explicitly overrides for a given task. Do not trigger for research, questions, or read-only exploration.
 
