@@ -1,5 +1,22 @@
 # User-level instructions
 
+## Coding workflow (Roblox projects only) — DO THIS FIRST
+
+**Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos.
+
+**DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
+
+For any new session where the user asks to write code:
+
+1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
+2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
+3. Delegate the implementation to the `code-writer` agent.
+4. Before pushing, run the `pr-correctness` and `pr-architecture` subagents on the changes as a self-review.
+5. Before creating the PR, ask the user for a Jira ticket number (e.g. `PROJ-123`). If there is no ticket, use `ADHOC`. Include the ticket in the PR title as a prefix (e.g. `PROJ-123: Add retry logic`).
+6. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft.
+
+Skip the worktree step only if the user explicitly overrides for a given task. Do not trigger for research, questions, or read-only exploration.
+
 ## No over-defensive constructor checks
 
 Skip precondition checks that either (a) duplicate a clear error the caller would get anyway from downstream code, or (b) silently coerce invalid input to a "sensible default."
@@ -19,21 +36,6 @@ Exception: trust boundaries (user input, network APIs, parsing untrusted data). 
 ## No `ctrl.Finish()` in Go gomock tests
 
 Don't write `defer ctrl.Finish()` after `gomock.NewController(t)`. Since gomock v1.5.0, the controller registers its own cleanup via `t.Cleanup`, so the explicit `Finish` is redundant. Just write `ctrl := gomock.NewController(t)` and move on.
-
-## Coding workflow (Roblox projects only)
-
-**Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos.
-
-For any new session where the user asks to write code:
-
-1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
-2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
-3. Delegate the implementation to the `code-writer` agent.
-4. Before pushing, run the `pr-correctness` and `pr-architecture` subagents on the changes as a self-review.
-5. Before creating the PR, ask the user for a Jira ticket number (e.g. `PROJ-123`). If there is no ticket, use `ADHOC`. Include the ticket in the PR title as a prefix (e.g. `PROJ-123: Add retry logic`).
-6. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft.
-
-Skip the worktree step only if the user explicitly overrides for a given task. Do not trigger for research, questions, or read-only exploration.
 
 ## Reviewing PRs on GitHub
 
