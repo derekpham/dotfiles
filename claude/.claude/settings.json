@@ -2,11 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(git push:*)",
-      "Bash(gh pr create:*)"
+      "Bash(gh pr create:*)",
+      "mcp__mcp-gateway-victoriametrics",
+      "mcp__mcp-gateway-slack",
+      "mcp__mcp-gateway-elasticsearch",
+      "mcp__mcp-gateway-glean",
+      "mcp__mcp-gateway-mosaic_mds",
+      "mcp__mcp-gateway-logs"
     ],
     "defaultMode": "bypassPermissions"
   },
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-4-8",
   "skipDangerousModePermissionPrompt": true,
   "hooks": {
     "PreToolUse": [
