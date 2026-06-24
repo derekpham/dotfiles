@@ -12,8 +12,7 @@
     ],
     "defaultMode": "bypassPermissions"
   },
-  "model": "claude-opus-4-7",
-  "skipDangerousModePermissionPrompt": true,
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -21,11 +20,12 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git push:*)",
-            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); if echo \"$cmd\" | grep -qE '(^|[[:space:]:/])(master|main)([[:space:]:]|$)'; then printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Blocked: git push to master/main is not allowed. Push to a feature branch and open a PR instead.\"}}'; fi"
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); if echo \"$cmd\" | grep -qE '(^|[[:space:]:/])(master|main)([[:space:]:]|$)'; then printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Blocked: git push to master/main is not allowed. Push to a feature branch and open a PR instead.\"}}'; fi",
+            "if": "Bash(git push:*)"
           }
         ]
       }
     ]
-  }
+  },
+  "skipDangerousModePermissionPrompt": true
 }
