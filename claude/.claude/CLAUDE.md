@@ -6,6 +6,8 @@
 
 **DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
 
+**DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent. The main loop must never use Write/Edit on source files. This ensures code-writer conventions (test style, error handling, abstraction rules) are always followed.
+
 For any new session where the user asks to write code:
 
 ### Phase 0: Setup
