@@ -25,6 +25,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'MANDATORY: You just created a PR. Start the Phase 3 CI monitoring loop NOW. Read .github/workflows/, then poll gh pr checks every 3 minutes until unit tests and integration tests pass with grep evidence. Do NOT report success or stop until CI is verified.'",
+            "if": "Bash(gh pr create:*)"
+          }
+        ]
+      }
     ]
   },
   "skipDangerousModePermissionPrompt": true

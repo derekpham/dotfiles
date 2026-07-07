@@ -79,17 +79,17 @@ For any new session where the user asks to write code:
 
 ## No over-defensive constructor checks
 
-Skip precondition checks that either (a) duplicate a clear error the caller would get anyway from downstream code, or (b) silently coerce invalid input to a "sensible default." These invariants belong in unit tests, not runtime code.
+Skip precondition checks that either (a) duplicate a clear error the caller would get anyway from downstream code, or (b) silently coerce invalid input to a "sensible default."
 
-Examples of checks to **not** add at runtime:
+Examples of checks to **not** add:
 
 - `if fileName == "" { return err }` when `os.Open` / `os.ReadFile` / etc. will fail with a clear error on the next line.
 - `if interval <= 0 { interval = defaultInterval }` — silent coercion conflates "caller forgot to set it" with "caller explicitly passed 0" and papers over both.
 - Nil checks on arguments that the caller is *expected* to pass — let the nil deref happen loudly rather than swapping in a silent fallback.
 
-**Enforce via unit tests instead.** Config validation and precondition assertions belong in test time, not runtime. Write unit tests that verify constructors/configs reject invalid values — this catches misuse during development without adding runtime overhead or silent fallbacks in production.
+Enforce these invariants via unit tests instead — write tests that pass invalid config/args and assert the expected failure. This catches misuse at development time without runtime overhead or silent fallbacks.
 
-How to decide: "If I remove this check, what does the caller see?" If the error is already clear (downstream `os` call fails, `time.NewTicker(0)` panics, etc.), the check is redundant — drop it. If you still want to guard against it, write a test that passes invalid input and asserts the expected failure.
+How to decide: "If I remove this check, what does the caller see?" If the error is already clear (downstream `os` call fails, `time.NewTicker(0)` panics, etc.), the check is redundant — drop it.
 
 If `0` / `""` / `nil` is meant as "use the default," use `*T`, an options struct, or a constructor that doesn't require it — so "not specified" is distinguishable from "explicitly invalid."
 
