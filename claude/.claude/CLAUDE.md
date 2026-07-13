@@ -6,7 +6,7 @@
 
 **DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
 
-**DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent. The main loop must never use Write/Edit on source files. The code-writer agent has its own rules for test coverage and conventions — do not override them. Describe the goal and provide context (relevant files, patterns, constraints), but do NOT enumerate implementation steps or specify test file names.
+**DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks: subtle concurrency, tricky algorithms, large multi-file changes). The main loop must never use Write/Edit on source files. The code-writer agents have their own rules for test coverage and conventions — do not override them. Describe the goal and provide context (relevant files, patterns, constraints), but do NOT enumerate implementation steps or specify test file names.
 
 For any new session where the user asks to write code:
 
@@ -33,7 +33,7 @@ For any new session where the user asks to write code:
 
 ### Phase 2: Implementation + unit tests
 
-5. Delegate the implementation to the `code-writer` agent. The code-writer will follow its own rules for:
+5. Delegate the implementation to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks). The code-writer will follow its own rules for:
    - Writing unit tests for all new/changed exported methods.
    - Full branch coverage of new code paths (unless awkward to achieve — e.g. platform-specific error paths, unreachable defensive branches).
    - Behavior-based assertions, not implementation-detail assertions.
@@ -51,13 +51,15 @@ For any new session where the user asks to write code:
 
 ### Phase 3: CI monitoring loop (mandatory after every push)
 
+> **Enforced by a Stop hook.** `~/.claude/hooks/ci-loop-guard.sh` runs whenever you try to end your turn. If the current branch has an OPEN PR with any pending or failing check, the hook **blocks you from stopping** and tells you to resume this loop. You cannot quietly exit while CI is red — the only sanctioned exits are the exit condition (all green, step 12) or the escalation path (step 11).
+
 9. **Read `.github/workflows/`** to understand which workflows run unit tests and integration tests. CI is a DAG — not all jobs are queued right away. Some workflows:
    - Depend on other workflows completing first (e.g. `workflow_run`, `needs:`).
    - Only run on specific path filters.
    - Are gated behind labels or manual triggers.
    You must read the repo's workflow files to know which job names to wait for and what triggers them. Don't assume all checks appear instantly or that an empty checks list means "nothing to run."
 
-10. **Start a monitoring loop** (poll every 3 minutes, 2-hour timeout that **resets on each new push**):
+10. **Start a monitoring loop** (poll every 3 minutes; the 2-hour budget **resets on each new push**):
     - Check the PR's CI status via `gh`.
     - Once CI completes, **verify tests actually ran:**
       - For unit tests: grep CI logs showing test files were executed.
@@ -65,39 +67,32 @@ For any new session where the user asks to write code:
     - If tests **pass** → show evidence to the user and exit the loop.
     - If tests **fail:**
       - If failure is **flaky** (infra timeout, rate limit, unrelated test) → rerun via `gh run rerun --failed`.
-      - If **unit tests** fail → delegate fix to code-writer → self-review → push → restart loop.
+      - If **unit tests** fail → delegate fix to a code-writer agent → self-review (`pr-correctness` + `pr-architecture`) → push → restart loop.
       - If **integration tests** fail → fix only if the test made a wrong assumption; otherwise fix the implementation → self-review → push → restart loop.
-    - If the loop times out (2 hours since last push) → alert the user and stop.
+    - Every fix goes through a code-writer agent and self-review — never a hand-edited "quick fix and push."
 
-11. **Exit condition:** Both unit tests and integration tests pass, with grep evidence shown to the user.
+11. **Escalation — the only sanctioned way to stop while CI is still red.** If all checks cannot be made to pass **without drastic or architectural changes** (redesigning a subsystem, changing a public contract or wire format, or work well outside this PR's scope), do NOT make those changes on your own. Instead:
+    - Create the release marker: `touch "$(git rev-parse --git-dir)/ci-loop-escalate"` — this lets the Stop hook release you exactly once.
+    - Then stop and tell the user precisely what is blocking, what drastic change would be required, and your recommended options.
+    Never silently give up, and never thrash indefinitely. If the 2-hour budget elapses with no path to green, treat it as this escalation case: check in with the user rather than continuing to poll in silence.
+
+12. **Exit condition:** Both unit tests and integration tests pass, with grep evidence shown to the user.
 
 ### Rules that apply across all phases
 
 - Skip the worktree step only if the user explicitly overrides.
 - Do not trigger this workflow for research, questions, or read-only exploration.
 - Every fix iteration (Phase 3 failures) goes through self-review before pushing — no "quick fix and push" shortcuts.
+- All code, in every phase (integration tests, implementation, review fixes, CI-failure fixes), goes through a code-writer agent and follows the rules in `~/.claude/rules/`.
 
-## No over-defensive constructor checks
+## Coding rules
 
-Skip precondition checks that either (a) duplicate a clear error the caller would get anyway from downstream code, or (b) silently coerce invalid input to a "sensible default."
+All coding and test rules live in `~/.claude/rules/`:
 
-Examples of checks to **not** add:
+- `general.md` — language-agnostic rules (abstraction, comments, error handling, scope, test design, and "no over-defensive constructor checks").
+- `go.md`, `python.md`, `typescript.md` — per-language specifics (standard-library preferences, test idioms, common pitfalls; e.g. no `ctrl.Finish()` in Go gomock tests).
 
-- `if fileName == "" { return err }` when `os.Open` / `os.ReadFile` / etc. will fail with a clear error on the next line.
-- `if interval <= 0 { interval = defaultInterval }` — silent coercion conflates "caller forgot to set it" with "caller explicitly passed 0" and papers over both.
-- Nil checks on arguments that the caller is *expected* to pass — let the nil deref happen loudly rather than swapping in a silent fallback.
-
-Enforce these invariants via unit tests instead — write tests that pass invalid config/args and assert the expected failure. This catches misuse at development time without runtime overhead or silent fallbacks.
-
-How to decide: "If I remove this check, what does the caller see?" If the error is already clear (downstream `os` call fails, `time.NewTicker(0)` panics, etc.), the check is redundant — drop it.
-
-If `0` / `""` / `nil` is meant as "use the default," use `*T`, an options struct, or a constructor that doesn't require it — so "not specified" is distinguishable from "explicitly invalid."
-
-Exception: trust boundaries (user input, network APIs, parsing untrusted data). Validation there is legitimate.
-
-## No `ctrl.Finish()` in Go gomock tests
-
-Don't write `defer ctrl.Finish()` after `gomock.NewController(t)`. Since gomock v1.5.0, the controller registers its own cleanup via `t.Cleanup`, so the explicit `Finish` is redundant. Just write `ctrl := gomock.NewController(t)` and move on.
+The `code-writer` / `code-writer-hard` and `pr-correctness` agents read these before working, so the writer and the reviewer enforce the same list. **Add new coding rules there — one place, no drift.**
 
 ## Reviewing PRs on GitHub
 
