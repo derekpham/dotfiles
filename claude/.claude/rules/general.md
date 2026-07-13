@@ -5,7 +5,6 @@ These rules apply to every language. Per-language specifics live alongside this 
 ## Don't over-abstract
 
 - No interface with one implementation. No generic helper with one caller. No config knob for a value that never varies.
-- Three similar lines is fine. Copy-paste is fine at two call sites. **Only extract a helper when the same logic appears in more than two places.** Two instances is a coincidence; three is a pattern.
 - No speculative parameters for "future flexibility." Add them when a second caller needs them.
 - No wrapping a working library call in your own function just to rename it.
 

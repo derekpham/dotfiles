@@ -53,7 +53,6 @@ Don't write `defer ctrl.Finish()` after `gomock.NewController(t)`. Since gomock 
 ## Architecture (for review)
 
 - Interfaces should be defined by the consumer, not the producer. If a new interface is added next to its only implementation, flag it.
-- Prefer small interfaces (1-3 methods). A 10-method interface usually means the consumer doesn't need everything.
 - `internal/` packages: things exposed outside `internal/` become API contracts — keep them minimal.
 - Avoid `interface{}` / `any` at package boundaries when a concrete type works.
 - Generics: is the type parameter pulling its weight, or would a concrete type be clearer?
