@@ -72,7 +72,7 @@ For any new session where the user asks to write code:
     - Every fix goes through a code-writer agent and self-review — never a hand-edited "quick fix and push."
 
 11. **Escalation — the only sanctioned way to stop while CI is still red.** If all checks cannot be made to pass **without drastic or architectural changes** (redesigning a subsystem, changing a public contract or wire format, or work well outside this PR's scope), do NOT make those changes on your own. Instead:
-    - Create the release marker: `touch "$(git rev-parse --git-dir)/ci-loop-escalate"` — this lets the Stop hook release you exactly once.
+    - Create the release marker: `touch "$(git rev-parse --absolute-git-dir)/ci-loop-escalate"` — this lets the Stop hook release you exactly once. (Run it from inside the worktree so it lands in the worktree's git dir, which is where the hook looks.)
     - Then stop and tell the user precisely what is blocking, what drastic change would be required, and your recommended options.
     Never silently give up, and never thrash indefinitely. If the 2-hour budget elapses with no path to green, treat it as this escalation case: check in with the user rather than continuing to poll in silence.
 

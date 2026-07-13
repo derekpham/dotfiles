@@ -5,15 +5,32 @@
 # with any pending or failing check. Allows the stop when:
 #   - there is no PR for the current branch, or the PR is not OPEN
 #   - all checks have passed (nothing pending, nothing failing)
-#   - gh is unavailable (never trap the agent)
+#   - jq or gh is unavailable (never trap the agent)
 #   - an escalation marker exists (agent decided passing needs drastic changes)
+#
+# Worktree-safe: the Phase 0 workflow does all work inside a git worktree, whose
+# branch/PR differ from the main checkout. A Stop hook may be launched from the
+# main repo root, so we cannot trust the ambient cwd. Stop hooks receive a JSON
+# payload on stdin that includes the working directory the agent was operating
+# in (.cwd); we cd into that before touching git/gh so the guard evaluates the
+# worktree's branch, not master.
 #
 # Escalation escape hatch: when passing is impossible without drastic/architectural
 # change, the agent creates "<git-dir>/ci-loop-escalate" and then stops to ask the
 # user. This hook consumes (removes) the marker and allows that single stop.
 set -uo pipefail
 
-git_dir=$(git rev-parse --git-dir 2>/dev/null)
+command -v jq >/dev/null 2>&1 || exit 0
+
+payload=$(cat 2>/dev/null || true)
+hook_cwd=$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null)
+if [ -n "$hook_cwd" ] && [ -d "$hook_cwd" ]; then
+  cd "$hook_cwd" || exit 0
+fi
+
+# --absolute-git-dir resolves to the worktree's own git dir (e.g.
+# .../.git/worktrees/<name>), so the escalation marker is scoped per worktree.
+git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null)
 if [ -n "$git_dir" ] && [ -f "$git_dir/ci-loop-escalate" ]; then
   rm -f "$git_dir/ci-loop-escalate"
   exit 0
