@@ -32,13 +32,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'MANDATORY: You just created a PR. Start the Phase 3 CI monitoring loop NOW. Read .github/workflows/, then poll gh pr checks every 3 minutes until unit tests and integration tests pass with grep evidence. Do NOT report success or stop until CI is verified.'",
+            "command": "echo 'PR created. CI monitoring is OFF and stays off through implementation and review cycles. When all changes are done and reviewed, run /ship to arm the CI-monitoring loop and drive it green.'",
             "if": "Bash(gh pr create:*)"
-          },
-          {
-            "type": "command",
-            "command": "echo 'You just pushed. If this push updates an open PR, RESUME the Phase 3 CI monitoring loop: re-read gh pr checks and poll every 3 minutes until unit and integration tests pass with grep evidence. The 2-hour budget resets on this push. Do NOT stop while CI is red.'",
-            "if": "Bash(git push:*)"
           }
         ]
       }
