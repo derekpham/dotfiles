@@ -15,6 +15,10 @@ Read alongside `general.md`. Add new Go rules here.
 
 - Wrap propagated errors with context: `fmt.Errorf("reading config: %w", err)`.
 
+## Naming
+
+- Avoid stutter: in `package s3type`, use `type DateTimeInput` not `type S3DateTimeInput`. The package qualifier already provides the namespace (`s3type.DateTimeInput`).
+
 ## Common pitfalls
 
 - Taking the address of a range variable inside a loop (Go 1.22+ fixed this, but flag it on older modules).
