@@ -32,6 +32,11 @@ Read alongside `general.md`. Add new Go rules here.
 - Flag unused variables the compiler won't catch: unused struct fields, unused return values that should be checked, dead branches.
 - Function parameters that are unused should be named `_` rather than given a real name. Example: `func (s *Server) Handle(_ context.Context, req *Request)` — not `ctx context.Context` when `ctx` is never used.
 
+### Tooling
+
+- The compiler already errors on unused imports and unused local variables — those never reach a diff.
+- For unused package-private funcs/types/consts and dead assignments, run `golangci-lint` with the `unused` (staticcheck `U1000`) and `ineffassign` linters. These are precise within a package. Use their output to find the code to delete.
+
 ## Tests
 
 - Prefer table-driven tests: `tests := []struct{ name string; ...; want ... }{ ... }` then `for _, tc := range tests { t.Run(tc.name, func(t *testing.T) { ... }) }`.

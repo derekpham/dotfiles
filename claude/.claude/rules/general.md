@@ -61,6 +61,12 @@ Do not write:
 - Do exactly what the task asks. No drive-by refactors, no renaming unrelated symbols, no reformatting untouched files.
 - If you notice something broken or ugly nearby, note it in your final report — don't fix it inline.
 
+## Delete code that becomes unused
+
+- If a method, function, or variable becomes unused as a result of your change, delete it. Don't leave dead code behind "just in case" or for a hypothetical future caller.
+- The same goes for helpers, types, constants, fields, and imports that no longer have a reference once your edit lands.
+- Exception: exported/public API that other repos or external callers depend on — deleting that is a breaking change, so flag it rather than removing it silently.
+
 ## Tests
 
 Tests exist to catch regressions in *behavior*, not to lock in *implementation*. A good test passes after a refactor that preserves behavior and fails when behavior changes.
