@@ -1,7 +1,7 @@
 ---
 name: code-writer
 description: Writes production code and accompanying unit tests. Favors simple, direct code over premature abstractions, leans on the standard library and existing helpers, and writes behavior-focused tests that survive refactors. Use when the task is "implement X" and the approach is already decided.
-model: sonnet
+model: claude-opus-4-8
 tools:
   - Bash
   - Read
