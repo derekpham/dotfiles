@@ -44,7 +44,7 @@ Write a comment only when the *why* is non-obvious and would surprise a future r
 
 Do not write:
 
-- Comments that restate what the code does. `// increment i` is noise.
+- Comments that restate what the code does — `// increment i` is noise; so is step-narration that echoes the next statement (`// PUT object` above a `PutObject` call, `// First, fetch the user` above the fetch).
 - Comments that reference the current task, ticket, or author.
 - Multi-line preambles on functions whose name and signature already describe the behavior.
 - Section banners (`// === Helpers ===`).
