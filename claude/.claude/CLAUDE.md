@@ -14,6 +14,18 @@ For any session where the user asks to write code in a personal project:
 4. Push the worktree's branch (`git push -u origin HEAD`) and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
 5. **Paste the PR URL in the reply and stop for review.** Do not mark the PR ready, merge it, or watch CI unless the user asks.
 
+**SSH git often fails in the Cursor agent sandbox** (`kex_exchange_identification`, `banner exchange`, `Network is down`) even while the user's own terminal can pull/push and `gh` / HTTPS still work. Do not tell the user to push, and do not treat a failed `git fetch` as proof that `origin/main` is current.
+
+A global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH. Bypass it by embedding a `gh` token in the URL (redact the token from command output):
+
+```bash
+TOKEN=$(env -u GH_ENTERPRISE_TOKEN gh auth token)
+git fetch "https://x-access-token:${TOKEN}@github.com/OWNER/REPO.git" <sha-or-ref>
+git push "https://x-access-token:${TOKEN}@github.com/OWNER/REPO.git" HEAD:BRANCH
+```
+
+Then create the draft PR with `gh` as usual. If the user's statement about git state contradicts local refs, retry this fetch before answering.
+
 Do not trigger this workflow for research, questions, or read-only exploration.
 
 ## Coding workflow (Roblox projects only) — DO THIS FIRST
