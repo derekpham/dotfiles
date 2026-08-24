@@ -1,5 +1,21 @@
 # User-level instructions
 
+## Coding workflow (personal projects)
+
+**Scope:** Applies when the current repo's git remote does **not** point to `github.rbx.com` (personal github.com repos). Check with `git remote -v` if unsure. For Roblox remotes, use the Roblox workflow below instead.
+
+**DO NOT edit on `master`/`main`.** Enter a worktree first. When the work is done, open a PR from that worktree and paste the PR link so it can be reviewed. Do not push `master`/`main`.
+
+For any session where the user asks to write code in a personal project:
+
+1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
+2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes. Skip the worktree only if the user explicitly overrides.
+3. Do the work in the worktree. Verify before treating it as done.
+4. Push the worktree's branch (`git push -u origin HEAD`) and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
+5. **Paste the PR URL in the reply and stop for review.** Do not mark the PR ready, merge it, or watch CI unless the user asks.
+
+Do not trigger this workflow for research, questions, or read-only exploration.
+
 ## Coding workflow (Roblox projects only) — DO THIS FIRST
 
 **Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos.
