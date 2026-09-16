@@ -47,6 +47,19 @@ If they don't add anything, omit them. The `## Why` and `## How` are the section
 
 ## 4. Always create as a draft
 
+For a personal repository whose `nameWithOwner` reported by `gh repo view` starts
+with `derekpham/`, never push through the configured SSH remote. Resolve the
+HTTPS URL and push the current branch first:
+
+```bash
+repo_url=$(gh repo view --json url --jq .url)
+branch=$(git branch --show-current)
+git push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+```
+
+This HTTPS rule is only for personal repositories. Leave the existing Roblox
+push workflow unchanged.
+
 Use `gh pr create --draft …`. Do not ask permission to draft — just draft it. The user marks the PR ready for review themselves when they're ready.
 
 Pass the body via heredoc to preserve formatting:

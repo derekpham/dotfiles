@@ -21,6 +21,19 @@ from the diff, branch name, or commits.
 - Add testing or follow-up sections only when they convey information not
   obvious from the diff.
 
+For a personal repository whose `nameWithOwner` reported by `gh repo view`
+starts with `derekpham/`, push the current branch over HTTPS rather than through
+the configured SSH remote:
+
+```bash
+repo_url=$(gh repo view --json url --jq .url)
+branch=$(git branch --show-current)
+git push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+```
+
+This HTTPS rule applies only to personal repositories. Leave the existing
+Roblox push workflow unchanged.
+
 Before creating the PR, inspect the branch diff and verify the title/body match
 it. Create it with `gh pr create --draft`, preserving Markdown formatting, and
 return the PR URL. Do not start monitoring CI.

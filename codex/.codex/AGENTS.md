@@ -13,10 +13,36 @@ applicable language file under `~/.claude/rules/`. Those files are the shared
 source of truth for both Claude and Codex. Follow repository conventions when
 they are more specific.
 
+## Personal GitHub workflow
+
+Apply this workflow when `gh repo view --json nameWithOwner --jq .nameWithOwner`
+starts with `derekpham/`. It is separate from the Roblox workflow below and
+does not apply to Roblox repositories.
+
+For any request that writes files:
+
+1. Update `master` or `main`, then create and enter a sibling worktree for a
+   new feature branch before editing. Never edit in the primary checkout unless
+   the user explicitly overrides this requirement.
+2. Make and verify the requested changes in the worktree, then commit them.
+3. Push over HTTPS regardless of the configured Git remote:
+
+   ```bash
+   repo_url=$(gh repo view --json url --jq .url)
+   branch=$(git branch --show-current)
+   git push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+   ```
+
+4. When the user requested a PR, use the `pr-create` skill to open a draft with
+   `gh pr create --draft`.
+
+Do not trigger this workflow for research, questions, or read-only exploration.
+
 ## Roblox coding workflow
 
 Apply this workflow only when the repository is hosted on `github.rbx.com`.
-Skip it for personal and public repositories.
+Skip it for personal and public repositories. Personal repositories use the
+separate workflow above.
 
 1. Start from an up-to-date `master` or `main` branch and create a separate
    worktree before editing. Never edit the primary branch unless the user

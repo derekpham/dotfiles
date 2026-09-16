@@ -1,8 +1,35 @@
 # User-level instructions
 
+## Personal GitHub workflow — DO THIS FIRST
+
+**Scope:** Applies when `gh repo view --json nameWithOwner --jq .nameWithOwner`
+starts with `derekpham/`. This workflow is separate from the Roblox workflow
+below. Do not apply it to Roblox repositories.
+
+For any request that writes files:
+
+1. Update `master` or `main`, then create and enter a sibling worktree for a
+   new feature branch before editing. Never edit in the primary checkout unless
+   the user explicitly overrides this requirement.
+2. Make and verify the requested changes in the worktree.
+3. Commit the changes on the feature branch.
+4. Push personal repositories over HTTPS, regardless of the configured Git
+   remote. Resolve the HTTPS URL with `gh`, then push the current branch:
+
+   ```bash
+   repo_url=$(gh repo view --json url --jq .url)
+   branch=$(git branch --show-current)
+   git push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+   ```
+
+5. When the user requested a PR, invoke the `pr-create` skill so the PR is
+   opened as a draft with `gh pr create --draft`.
+
+Do not trigger this workflow for research, questions, or read-only exploration.
+
 ## Coding workflow (Roblox projects only) — DO THIS FIRST
 
-**Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos.
+**Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos. Personal repositories use the separate workflow above.
 
 **DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
 
