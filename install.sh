@@ -154,11 +154,18 @@ link_one() {
 
 install_dir() {
   local pkg_dir=$1 src rel dst
+  if [[ -d "$pkg_dir/.agents/skills" ]]; then
+    while IFS= read -r -d '' src; do
+      rel=${src#"$pkg_dir"/}
+      dst="$HOME/$rel"
+      link_one "$src" "$dst"
+    done < <(find "$pkg_dir/.agents/skills" -mindepth 1 -maxdepth 1 -type d -print0)
+  fi
   while IFS= read -r -d '' src; do
     rel=${src#"$pkg_dir"/}
     dst="$HOME/$rel"
     link_one "$src" "$dst"
-  done < <(find "$pkg_dir" -mindepth 1 -type f -print0)
+  done < <(find "$pkg_dir" -type d -path "$pkg_dir/.agents/skills/*" -prune -o -type f -print0)
 }
 
 install_package() {
