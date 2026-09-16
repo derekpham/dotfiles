@@ -47,6 +47,17 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/worktree-cleanup.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
     ]
   },
   "skipDangerousModePermissionPrompt": true,

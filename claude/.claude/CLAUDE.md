@@ -27,6 +27,17 @@ For any request that writes files:
 5. When the user requested a PR, invoke the `pr-create` skill so the PR is
    opened as a draft with `gh pr create --draft`.
 
+After the draft PR is created, and after every later successful push, arm safe
+session-end cleanup by recording the pushed commit:
+
+```bash
+git rev-parse HEAD > "$(git rev-parse --absolute-git-dir)/remove-worktree-on-session-end"
+```
+
+The `SessionEnd` hook removes the worktree only when it is clean and still at
+that exact commit. It never uses `--force`; if verification fails, leave the
+worktree intact.
+
 Do not trigger this workflow for research, questions, or read-only exploration.
 
 ## Coding workflow (Roblox projects only) — DO THIS FIRST

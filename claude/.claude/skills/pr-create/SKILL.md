@@ -64,6 +64,16 @@ push workflow unchanged.
 
 Use `gh pr create --draft …`. Do not ask permission to draft — just draft it. The user marks the PR ready for review themselves when they're ready.
 
+After `gh pr create` succeeds in a personal repository, arm session-end
+worktree cleanup with the pushed commit:
+
+```bash
+git rev-parse HEAD > "$(git rev-parse --absolute-git-dir)/remove-worktree-on-session-end"
+```
+
+Refresh this marker after every later successful push. Never create it before
+the push and PR creation succeed.
+
 Pass the body via heredoc to preserve formatting:
 
 ```bash

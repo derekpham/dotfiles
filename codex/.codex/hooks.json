@@ -37,6 +37,17 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/hooks/worktree-cleanup.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
     ]
   }
 }

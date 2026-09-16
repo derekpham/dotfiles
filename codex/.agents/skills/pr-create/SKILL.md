@@ -38,4 +38,12 @@ Roblox push workflow unchanged.
 
 Before creating the PR, inspect the branch diff and verify the title/body match
 it. Create it with `gh pr create --draft`, preserving Markdown formatting, and
-return the PR URL. Do not start monitoring CI.
+then arm session-end worktree cleanup with the pushed commit:
+
+```bash
+git rev-parse HEAD > "$(git rev-parse --absolute-git-dir)/remove-worktree-on-session-end"
+```
+
+Refresh this marker after every later successful push. Never create it before
+the push and PR creation succeed. Return the PR URL and do not start monitoring
+CI.
