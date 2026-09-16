@@ -28,7 +28,9 @@ the configured SSH remote:
 ```bash
 repo_url=$(gh repo view --json url --jq .url)
 branch=$(git branch --show-current)
-git push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+GIT_CONFIG_GLOBAL=/dev/null git \
+  -c credential.helper='!gh auth git-credential' \
+  push "${repo_url}.git" "HEAD:refs/heads/${branch}"
 ```
 
 This HTTPS rule applies only to personal repositories. Leave the existing

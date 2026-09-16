@@ -19,7 +19,9 @@ For any request that writes files:
    ```bash
    repo_url=$(gh repo view --json url --jq .url)
    branch=$(git branch --show-current)
-   git push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+   GIT_CONFIG_GLOBAL=/dev/null git \
+     -c credential.helper='!gh auth git-credential' \
+     push "${repo_url}.git" "HEAD:refs/heads/${branch}"
    ```
 
 5. When the user requested a PR, invoke the `pr-create` skill so the PR is
