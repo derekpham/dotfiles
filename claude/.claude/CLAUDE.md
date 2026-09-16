@@ -1,31 +1,34 @@
 # User-level instructions
 
-## Personal GitHub workflow — DO THIS FIRST
+## Coding workflow (personal projects)
 
-**Scope:** Applies when `gh repo view --json nameWithOwner --jq .nameWithOwner`
-starts with `derekpham/`. This workflow is separate from the Roblox workflow
-below. Do not apply it to Roblox repositories.
+**Scope:** Applies when the current repo's git remote does **not** point to `github.rbx.com` (personal github.com repos). Check with `git remote -v` if unsure. For Roblox remotes, use the Roblox workflow below instead.
 
-For any request that writes files:
+**DO NOT edit on `master`/`main`.** Enter a worktree first. When the work is done, open a PR from that worktree and paste the PR link so it can be reviewed. Do not push `master`/`main`.
 
-1. Update `master` or `main`, then create and enter a sibling worktree for a
-   new feature branch before editing. Never edit in the primary checkout unless
-   the user explicitly overrides this requirement.
-2. Make and verify the requested changes in the worktree.
-3. Commit the changes on the feature branch.
-4. Push personal repositories over HTTPS, regardless of the configured Git
-   remote. Resolve the HTTPS URL with `gh`, then push the current branch:
+For any session where the user asks to write code in a personal project:
 
-   ```bash
-   repo_url=$(gh repo view --json url --jq .url)
-   branch=$(git branch --show-current)
-   GIT_CONFIG_GLOBAL=/dev/null git \
-     -c credential.helper='!gh auth git-credential' \
-     push "${repo_url}.git" "HEAD:refs/heads/${branch}"
-   ```
+1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
+2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes. Skip the worktree only if the user explicitly overrides.
+3. Do the work in the worktree. Verify before treating it as done.
+4. Push the worktree branch over HTTPS and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
+5. **Paste the PR URL in the reply and stop for review.** Do not mark the PR ready, merge it, or watch CI unless the user asks.
 
-5. When the user requested a PR, invoke the `pr-create` skill so the PR is
-   opened as a draft with `gh pr create --draft`.
+**SSH git often fails in the Cursor agent sandbox** (`kex_exchange_identification`, `banner exchange`, `Network is down`) even while the user's own terminal can pull/push and `gh` / HTTPS still work. Do not tell the user to push, and do not treat a failed `git fetch` as proof that `origin/main` is current.
+
+A global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH. Disable the global rewrite for the command and use `gh` as Git's credential helper:
+
+```bash
+repo_url=$(gh repo view --json url --jq .url)
+branch=$(git branch --show-current)
+GIT_CONFIG_GLOBAL=/dev/null git \
+  -c credential.helper='!gh auth git-credential' \
+  push "${repo_url}.git" "HEAD:refs/heads/${branch}"
+```
+
+Then create the draft PR with `gh` as usual. If the user's statement about Git
+state contradicts local refs, refresh them over HTTPS with the same credential
+helper before answering.
 
 After the draft PR is created, and after every later successful push, arm safe
 session-end cleanup by recording the pushed commit:
