@@ -11,26 +11,41 @@ For any session where the user asks to write code in a personal project:
 1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
 2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes. Skip the worktree only if the user explicitly overrides.
 3. Do the work in the worktree. Verify before treating it as done.
-4. Push the worktree's branch (`git push -u origin HEAD`) and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
+4. Push the worktree branch over HTTPS and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
 5. **Paste the PR URL in the reply and stop for review.** Do not mark the PR ready, merge it, or watch CI unless the user asks.
 
 **SSH git often fails in the Cursor agent sandbox** (`kex_exchange_identification`, `banner exchange`, `Network is down`) even while the user's own terminal can pull/push and `gh` / HTTPS still work. Do not tell the user to push, and do not treat a failed `git fetch` as proof that `origin/main` is current.
 
-A global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH. Bypass it by embedding a `gh` token in the URL (redact the token from command output):
+A global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH. Disable the global rewrite for the command and use `gh` as Git's credential helper:
 
 ```bash
-TOKEN=$(env -u GH_ENTERPRISE_TOKEN gh auth token)
-git fetch "https://x-access-token:${TOKEN}@github.com/OWNER/REPO.git" <sha-or-ref>
-git push "https://x-access-token:${TOKEN}@github.com/OWNER/REPO.git" HEAD:BRANCH
+repo_url=$(gh repo view --json url --jq .url)
+branch=$(git branch --show-current)
+GIT_CONFIG_GLOBAL=/dev/null git \
+  -c credential.helper='!gh auth git-credential' \
+  push "${repo_url}.git" "HEAD:refs/heads/${branch}"
 ```
 
-Then create the draft PR with `gh` as usual. If the user's statement about git state contradicts local refs, retry this fetch before answering.
+Then create the draft PR with `gh` as usual. If the user's statement about Git
+state contradicts local refs, refresh them over HTTPS with the same credential
+helper before answering.
+
+After the draft PR is created, and after every later successful push, arm safe
+session-end cleanup by recording the pushed commit:
+
+```bash
+git rev-parse HEAD > "$(git rev-parse --absolute-git-dir)/remove-worktree-on-session-end"
+```
+
+The `SessionEnd` hook removes the worktree only when it is clean and still at
+that exact commit. It never uses `--force`; if verification fails, leave the
+worktree intact.
 
 Do not trigger this workflow for research, questions, or read-only exploration.
 
 ## Coding workflow (Roblox projects only) — DO THIS FIRST
 
-**Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos.
+**Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos. Personal repositories use the separate workflow above.
 
 **DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
 

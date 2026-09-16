@@ -1,0 +1,53 @@
+{
+  "description": "Personal Codex workflow guardrails",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/hooks/protect-primary-push.sh\"",
+            "timeout": 3,
+            "statusMessage": "Checking push target"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/hooks/pr-created-reminder.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/hooks/ci-loop-guard.sh\"",
+            "timeout": 30,
+            "statusMessage": "Checking active CI loop"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/hooks/worktree-cleanup.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}
