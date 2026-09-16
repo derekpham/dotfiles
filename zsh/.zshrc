@@ -109,6 +109,15 @@ source $HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# deCLAWd launchers.
+export PATH="$HOME/.local/bin:$PATH"
+
+# Run Codex with the dotfiles-managed profile and deCLAWd's VPN-gated
+# no-prompt mode. deCLAWd still enforces its outer filesystem/network sandbox.
+codex() {
+  "$HOME/.local/bin/codex" --profile personal --yolo "$@"
+}
+
 HB_CNF_HANDLER="$(brew --repository)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
 if [ -f "$HB_CNF_HANDLER" ]; then
 source "$HB_CNF_HANDLER";
