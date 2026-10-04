@@ -47,9 +47,13 @@ If they don't add anything, omit them. The `## Why` and `## How` are the section
 
 ## 4. Always create as a draft
 
-For a personal repository whose `nameWithOwner` reported by `gh repo view` starts
-with `derekpham/`, never push through the configured SSH remote. Resolve the
-HTTPS URL and push the current branch first:
+Push the current branch first with `git push -u origin HEAD`. Claude Code's
+worktree isolation refuses git commands that set `GIT_CONFIG_GLOBAL` or redirect
+into the git dir, so keep git invocations plain and run them one at a time.
+
+Only if that SSH push fails outside a Claude Code worktree, for a personal
+repository whose `nameWithOwner` reported by `gh repo view` starts with
+`derekpham/`, resolve the HTTPS URL and push over it instead:
 
 ```bash
 repo_url=$(gh repo view --json url --jq .url)
@@ -65,10 +69,10 @@ push workflow unchanged.
 Use `gh pr create --draft …`. Do not ask permission to draft — just draft it. The user marks the PR ready for review themselves when they're ready.
 
 After `gh pr create` succeeds in a personal repository, arm session-end
-worktree cleanup with the pushed commit:
+worktree cleanup by recording the pushed commit in a per-worktree ref:
 
 ```bash
-git rev-parse HEAD > "$(git rev-parse --absolute-git-dir)/remove-worktree-on-session-end"
+git update-ref refs/worktree/cleanup-armed HEAD
 ```
 
 Refresh this marker after every later successful push. Never create it before

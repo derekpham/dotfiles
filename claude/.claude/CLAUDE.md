@@ -11,12 +11,16 @@ For any session where the user asks to write code in a personal project:
 1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
 2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes. Skip the worktree only if the user explicitly overrides.
 3. Do the work in the worktree. Verify before treating it as done.
-4. Push the worktree branch over HTTPS and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
+4. Push the worktree branch and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
 5. **Paste the PR URL in the reply and stop for review.** Do not mark the PR ready, merge it, or watch CI unless the user asks.
+
+Push with `git push -u origin HEAD`. Claude Code's worktree isolation refuses
+git commands that set `GIT_CONFIG_GLOBAL` or redirect into the git dir, so keep
+git invocations plain and run them one at a time.
 
 **SSH git often fails in the Cursor agent sandbox** (`kex_exchange_identification`, `banner exchange`, `Network is down`) even while the user's own terminal can pull/push and `gh` / HTTPS still work. Do not tell the user to push, and do not treat a failed `git fetch` as proof that `origin/main` is current.
 
-A global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH. Disable the global rewrite for the command and use `gh` as Git's credential helper:
+Only when SSH fails outside a Claude Code worktree: a global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH, so disable the global rewrite for the command and use `gh` as Git's credential helper:
 
 ```bash
 repo_url=$(gh repo view --json url --jq .url)
@@ -31,10 +35,10 @@ state contradicts local refs, refresh them over HTTPS with the same credential
 helper before answering.
 
 After the draft PR is created, and after every later successful push, arm safe
-session-end cleanup by recording the pushed commit:
+session-end cleanup by recording the pushed commit in a per-worktree ref:
 
 ```bash
-git rev-parse HEAD > "$(git rev-parse --absolute-git-dir)/remove-worktree-on-session-end"
+git update-ref refs/worktree/cleanup-armed HEAD
 ```
 
 The `SessionEnd` hook removes the worktree only when it is clean and still at
