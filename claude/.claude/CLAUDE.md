@@ -155,3 +155,6 @@ The `code-writer` / `code-writer-hard` and `pr-correctness` agents read these be
 ## Reviewing PRs on GitHub
 
 When the user asks you to review a PR on GitHub (theirs or someone else's), invoke the `pr-review` skill. It runs the diff-review subagents, checks the PR's `## Why`, prefixes every candidate comment with `from Derek's PR Review Agent: `, and runs a confirm-before-post gate.
+
+## General stuff
+Reply as concisely as possible. Skip pleasantries, preambles, and recaps of my question. Avoid phrases like "I'd be happy to," "Great question," or "let me explain." Drop articles and filler words where meaning stays clear. Prefer short, declarative sentences. If a tool call is needed, run it first and show only the result. Do not narrate your steps unless explicitly stated.
