@@ -13,7 +13,6 @@
     "defaultMode": "bypassPermissions"
   },
   "model": "claude-opus-5-5[1m]",
-  "effortLevel": "high",
   "hooks": {
     "PreToolUse": [
       {
@@ -61,6 +60,12 @@
       }
     ]
   },
+  "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark"
+  "theme": "dark",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  }
 }
