@@ -55,7 +55,7 @@ Do not trigger this workflow for research, questions, or read-only exploration.
 
 **DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks: subtle concurrency, tricky algorithms, large multi-file changes). The main loop must never use Write/Edit on source files. The code-writer agents have their own rules for test coverage and conventions — do not override them. Describe the goal and provide context (relevant files, patterns, constraints), but do NOT enumerate implementation steps or specify test file names.
 
-**CI monitoring is never automatic.** Writing tests, implementing, pushing, and review cycles never watch CI on their own. The CI-monitoring loop runs only when the user invokes the `/ship` command (Phase 3). Until then, you always stop cleanly for the user to review.
+**CI monitoring is never automatic.** Writing tests, implementing, pushing, and review cycles never watch CI on their own. The CI-monitoring loop runs only when the user invokes the `/ship` command (Phase 3). `/ship` covers only the current PR. Until then, you always stop cleanly for the user to review.
 
 For any new session where the user asks to write code:
 
@@ -64,54 +64,49 @@ For any new session where the user asks to write code:
 1. Run `git fetch origin` to refresh `origin/master` / `origin/main`. Do not check out or pull `master`/`main` in the shared checkout.
 2. If cwd is not already under `.claude/worktrees/`, enter a new worktree via `EnterWorktree` (it branches from `origin/<default-branch>`) before making changes. Background sessions (`claude agents`) already enforce this.
 
-### Phase 1: Plan + integration tests
+### Phase 1: Plan
 
-3. **Plan the work.** Even if the user says "implement X," plan first. The plan must address:
-   - What is being changed and why.
-   - Which files/packages are affected.
-   - **Integration tests:** Do existing integration tests cover this feature area? If yes, state whether new integration tests are needed and why/why not. If this is a new feature with no existing integration test coverage, ask the user whether they want integration tests. Resolve this during planning — never as an afterthought.
-   - **Implementation steps broken into PRs:** Each PR is the smallest possible behavior change that adds no dead code (every new symbol has a caller in the same PR). Target ~300–400 lines of code per PR, excluding tests, generated code, and spec files. List the PRs in order with what each one changes.
+3. **Plan the work with the `design-architect` agent.** Even if the user says "implement X," plan first. Give it the task and context. It sets the overall direction for the whole task, then breaks it into an ordered sequence of PRs following its "PR breakdown rules" (smallest behavior change per PR, no dead code, ~300–400 lines excluding tests, generated code, and spec files). For each PR the plan also states whether it needs integration tests: check whether existing integration tests cover the area, and if the feature area has none, ask the user whether they want them. Integration tests land in the PR whose behavior they cover, not up front.
    - Present the plan to the user for approval before proceeding.
 
-4. **If integration tests are needed**, write them first:
-   - Test at public boundaries only: API endpoints, CLI output, exported package interfaces, database state, HTTP responses.
-   - **Never** assert on internal function calls, struct layouts, dependency wiring, or implementation details.
-   - Tests **must not break** on code refactors or architecture refactors (unless the requested change is itself architectural).
-   - Delegate to the `code-writer` agent.
-   - Draft a PR with only the integration tests. Use the `pr-create` skill. Ask for the Jira ticket first (or `ADHOC`).
-   - **STOP — wait for user approval** before proceeding to implementation. Do not monitor CI here: this PR is for reviewing the test *design*, and the tests may not pass yet (no implementation exists). Iterate on the tests with the user's feedback until they approve.
+### Phase 2: One PR at a time
 
-### Phase 2: Implementation + unit tests
+Repeat steps 4–7 for each PR in the approved plan, in order. Start the next PR only when the user says so. If the previous PR hasn't merged yet, branch the next one from it.
 
-5. Once the user approves the tests, delegate the implementation to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks). The code-writer will follow its own rules for:
+4. Delegate the PR's scope from the plan to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks). The code-writer will follow its own rules for:
    - Writing unit tests for all new/changed exported methods.
    - Full branch coverage of new code paths (unless awkward to achieve — e.g. platform-specific error paths, unreachable defensive branches).
    - Behavior-based assertions, not implementation-detail assertions.
-   - Integration tests from Phase 1 must continue to pass without modification (unless they made a wrong assumption).
+   - Integration tests, if the plan calls for them in this PR:
+     - Test at public boundaries only: API endpoints, CLI output, exported package interfaces, database state, HTTP responses.
+     - **Never** assert on internal function calls, struct layouts, dependency wiring, or implementation details.
+     - Tests **must not break** on code refactors or architecture refactors (unless the requested change is itself architectural).
+   - Integration tests from earlier PRs must continue to pass without modification (unless they made a wrong assumption).
 
-6. **Self-review before pushing.** Run `pr-correctness` and `pr-architecture` subagents on the diff. Both must verify:
+5. **Self-review before pushing.** Run `pr-correctness` and `pr-architecture` subagents on the diff. Both must verify:
    - All new exported methods have unit tests.
    - Coverage of new code paths is complete (flag gaps explicitly).
    - Unit tests assert on behavior, not implementation.
-   - Integration tests were not modified (unless a wrong assumption was identified).
+   - The PR adds no dead code and stays within the plan's scope for it.
+   - Existing integration tests were not modified (unless a wrong assumption was identified).
 
-7. Before creating the PR, ask the user for a Jira ticket number (e.g. `PROJ-123`). If there is no ticket, use `ADHOC`. Include the ticket in the PR title as a prefix.
+6. Before creating the first PR, ask the user for a Jira ticket number (e.g. `PROJ-123`). If there is no ticket, use `ADHOC`. Include the ticket in the PR title as a prefix. Reuse it for later PRs in the plan unless the user says otherwise.
 
-8. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft. Then **stop for review.** Do not monitor CI yet — expect one or more review cycles (delegate every fix to a code-writer agent + self-review). CI monitoring starts only when the user runs `/ship`.
+7. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft. Then **stop for review.** Do not monitor CI yet — expect one or more review cycles (delegate every fix to a code-writer agent + self-review). CI monitoring starts only when the user runs `/ship`.
 
-### Phase 3: Ship — CI monitoring loop (runs ONLY when the user invokes `/ship`)
+### Phase 3: Ship — CI monitoring loop for a single PR (runs ONLY when the user invokes `/ship`)
 
-> **Enforced by a Stop hook, but only while a loop is *armed*.** Nothing here runs until the user invokes the `/ship` skill. `/ship` arms a `ci-loop-active` marker (an epoch timestamp) in the worktree's git dir. While that marker is live *and* the branch's open PR has pending/failing checks, `~/.claude/hooks/ci-loop-guard.sh` **blocks you from ending your turn** and tells you to resume this loop. The marker — and the block — clears automatically when CI goes green, the PR closes, or the marker goes stale (older than the hook's TTL, a safety net for an abandoned loop). So plain chat, code-improvement discussions, test/implementation/review work, and stale branches are never blocked. The only sanctioned exits while CI is red are the exit condition (all green, step 12) and escalation (step 11). If the user asks you to stop monitoring, remove the marker (`rm -f "$(git rev-parse --absolute-git-dir)/ci-loop-active"`) and stop.
+> **Enforced by a Stop hook, but only while a loop is *armed*.** Nothing here runs until the user invokes the `/ship` skill. `/ship` arms a `ci-loop-active` marker (an epoch timestamp) in the worktree's git dir. While that marker is live *and* the branch's open PR has pending/failing checks, `~/.claude/hooks/ci-loop-guard.sh` **blocks you from ending your turn** and tells you to resume this loop. The marker — and the block — clears automatically when CI goes green, the PR closes, or the marker goes stale (older than the hook's TTL, a safety net for an abandoned loop). So plain chat, code-improvement discussions, test/implementation/review work, and stale branches are never blocked. The only sanctioned exits while CI is red are the exit condition (all green, step 11) and escalation (step 10). If the user asks you to stop monitoring, remove the marker (`rm -f "$(git rev-parse --absolute-git-dir)/ci-loop-active"`) and stop.
 
 The `/ship` skill walks you through the following; this is the canonical procedure it points to:
 
-9. **Read `.github/workflows/`** to understand which workflows run unit tests and integration tests. CI is a DAG — not all jobs are queued right away. Some workflows:
+8. **Read `.github/workflows/`** to understand which workflows run unit tests and integration tests. CI is a DAG — not all jobs are queued right away. Some workflows:
    - Depend on other workflows completing first (e.g. `workflow_run`, `needs:`).
    - Only run on specific path filters.
    - Are gated behind labels or manual triggers.
    You must read the repo's workflow files to know which job names to wait for and what triggers them. Don't assume all checks appear instantly or that an empty checks list means "nothing to run."
 
-10. **Monitor** (poll every 3 minutes; re-arm the marker on each push so the stale-timeout budget resets):
+9. **Monitor** (poll every 3 minutes; re-arm the marker on each push so the stale-timeout budget resets):
     - Check the PR's CI status via `gh`.
     - Once CI completes, **verify tests actually ran:**
       - For unit tests: grep CI logs showing test files were executed.
@@ -123,19 +118,19 @@ The `/ship` skill walks you through the following; this is the canonical procedu
       - If **integration tests** fail → fix only if the test made a wrong assumption; otherwise fix the implementation → self-review → push → re-arm → restart loop.
     - Every fix goes through a code-writer agent and self-review — never a hand-edited "quick fix and push."
 
-11. **Escalation — the only sanctioned way to stop while CI is still red.** If all checks cannot be made to pass **without drastic or architectural changes** (redesigning a subsystem, changing a public contract or wire format, or work well outside this PR's scope), do NOT make those changes on your own. Instead:
+10. **Escalation — the only sanctioned way to stop while CI is still red.** If all checks cannot be made to pass **without drastic or architectural changes** (redesigning a subsystem, changing a public contract or wire format, or work well outside this PR's scope), do NOT make those changes on your own. Instead:
     - Create the release marker: `touch "$(git rev-parse --absolute-git-dir)/ci-loop-escalate"` — this lets the Stop hook release you exactly once and stands down the loop. (Run it from inside the worktree.)
     - Then stop and tell the user precisely what is blocking, what drastic change would be required, and your recommended options.
     Never silently give up, and never thrash indefinitely.
 
-12. **Exit condition:** Both unit tests and integration tests pass, with grep evidence shown to the user.
+11. **Exit condition:** Unit tests and the PR's integration tests (if any) pass, with grep evidence shown to the user.
 
 ### Rules that apply across all phases
 
 - Skip the worktree step only if the user explicitly overrides.
 - Do not trigger this workflow for research, questions, or read-only exploration.
 - Every fix iteration goes through self-review before pushing — no "quick fix and push" shortcuts.
-- All code, in every phase (integration tests, implementation, review fixes, CI-failure fixes), goes through a code-writer agent and follows the rules in `~/.claude/rules/`.
+- All code, in every phase (implementation, integration tests, review fixes, CI-failure fixes), goes through a code-writer agent and follows the rules in `~/.claude/rules/`.
 
 ### CI-loop marker files (quick reference)
 
