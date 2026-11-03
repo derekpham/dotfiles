@@ -55,6 +55,8 @@ Do not trigger this workflow for research, questions, or read-only exploration.
 
 **DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks: subtle concurrency, tricky algorithms, large multi-file changes). The main loop must never use Write/Edit on source files. The code-writer agents have their own rules for test coverage and conventions — do not override them. Describe the goal and provide context (relevant files, patterns, constraints), but do NOT enumerate implementation steps or specify test file names.
 
+**Exception — trivial changes.** Typos, comment or doc edits, renames, a constant or config value, or a one-line fix with no new behavior may be edited directly by the main loop, and skip Phase 1 planning. Everything else still applies: worktree, self-review (step 5), `pr-create`, and `/ship`. If the change grows beyond trivial, stop editing and go back to the normal flow.
+
 **CI monitoring is never automatic.** Writing tests, implementing, pushing, and review cycles never watch CI on their own. The CI-monitoring loop runs only when the user invokes the `/ship` command (Phase 3). `/ship` covers only the current PR. Until then, you always stop cleanly for the user to review.
 
 For any new session where the user asks to write code:
@@ -116,7 +118,7 @@ The `/ship` skill walks you through the following; this is the canonical procedu
       - If failure is **flaky** (infra timeout, rate limit, unrelated test) → rerun via `gh run rerun --failed`.
       - If **unit tests** fail → delegate fix to a code-writer agent → self-review (`pr-correctness` + `pr-architecture`) → push → re-arm → restart loop.
       - If **integration tests** fail → fix only if the test made a wrong assumption; otherwise fix the implementation → self-review → push → re-arm → restart loop.
-    - Every fix goes through a code-writer agent and self-review — never a hand-edited "quick fix and push."
+    - Every fix goes through a code-writer agent (unless trivial — see the exception above) and self-review — never an unreviewed "quick fix and push."
 
 10. **Escalation — the only sanctioned way to stop while CI is still red.** If all checks cannot be made to pass **without drastic or architectural changes** (redesigning a subsystem, changing a public contract or wire format, or work well outside this PR's scope), do NOT make those changes on your own. Instead:
     - Create the release marker: `touch "$(git rev-parse --absolute-git-dir)/ci-loop-escalate"` — this lets the Stop hook release you exactly once and stands down the loop. (Run it from inside the worktree.)
@@ -130,7 +132,7 @@ The `/ship` skill walks you through the following; this is the canonical procedu
 - Skip the worktree step only if the user explicitly overrides.
 - Do not trigger this workflow for research, questions, or read-only exploration.
 - Every fix iteration goes through self-review before pushing — no "quick fix and push" shortcuts.
-- All code, in every phase (implementation, integration tests, review fixes, CI-failure fixes), goes through a code-writer agent and follows the rules in `~/.claude/rules/`.
+- All code, in every phase (implementation, integration tests, review fixes, CI-failure fixes), goes through a code-writer agent (except trivial changes) and follows the rules in `~/.claude/rules/`.
 
 ### CI-loop marker files (quick reference)
 
