@@ -70,6 +70,7 @@ For any new session where the user asks to write code:
    - What is being changed and why.
    - Which files/packages are affected.
    - **Integration tests:** Do existing integration tests cover this feature area? If yes, state whether new integration tests are needed and why/why not. If this is a new feature with no existing integration test coverage, ask the user whether they want integration tests. Resolve this during planning — never as an afterthought.
+   - **Implementation steps broken into PRs:** Each PR is the smallest possible behavior change that adds no dead code (every new symbol has a caller in the same PR). Target ~300–400 lines of code per PR, excluding tests, generated code, and spec files. List the PRs in order with what each one changes.
    - Present the plan to the user for approval before proceeding.
 
 4. **If integration tests are needed**, write them first:
