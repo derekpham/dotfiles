@@ -57,13 +57,14 @@ Apply this workflow only when the repository is hosted on `github.rbx.com`.
 Skip it for personal and public repositories. Personal repositories use the
 separate workflow above.
 
-1. Start from an up-to-date `master` or `main` branch and create a separate
-   worktree before editing. Never edit the primary branch unless the user
-   explicitly requests it.
+1. Start from an up-to-date `master` or `main` branch. Do not edit anything
+   yet.
 2. Plan first. Cover the reason for the change, affected packages, and whether
    existing integration tests cover the behavior. For a new feature without
    integration coverage, ask whether the user wants integration tests.
-3. Present the plan and wait for approval before implementation.
+3. Present the plan and wait for approval. Once approved, create a separate
+   worktree from the updated branch before editing. Never edit the primary
+   branch unless the user explicitly requests it.
 4. Delegate all code and test changes to `code_writer`, or to
    `code_writer_hard` for subtle concurrency, difficult algorithms, or large
    multi-file changes.

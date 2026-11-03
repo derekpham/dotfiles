@@ -51,7 +51,7 @@ Do not trigger this workflow for research, questions, or read-only exploration.
 
 **Scope:** Applies when the current repo's git remote points to `github.rbx.com`. Check with `git remote -v` if unsure; skip this workflow for non-Roblox repos. Personal repositories use the separate workflow above.
 
-**DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
+**DO NOT edit, write, or create any file before entering the worktree (step 3). Planning (step 2) is read-only and happens on the updated `master`/`main`. DO NOT skip the worktree — editing files on master is never acceptable unless the user explicitly says so.**
 
 **DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks: subtle concurrency, tricky algorithms, large multi-file changes). The main loop must never use Write/Edit on source files. The code-writer agents have their own rules for test coverage and conventions — do not override them. Describe the goal and provide context (relevant files, patterns, constraints), but do NOT enumerate implementation steps or specify test file names.
 
@@ -62,15 +62,16 @@ For any new session where the user asks to write code:
 ### Phase 0: Setup
 
 1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
-2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
 
 ### Phase 1: Plan + integration tests
 
-3. **Plan the work.** Even if the user says "implement X," plan first. The plan must address:
+2. **Plan the work.** Even if the user says "implement X," plan first. The plan must address:
    - What is being changed and why.
    - Which files/packages are affected.
    - **Integration tests:** Do existing integration tests cover this feature area? If yes, state whether new integration tests are needed and why/why not. If this is a new feature with no existing integration test coverage, ask the user whether they want integration tests. Resolve this during planning — never as an afterthought.
    - Present the plan to the user for approval before proceeding.
+
+3. Once the plan is approved, enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making any changes.
 
 4. **If integration tests are needed**, write them first:
    - Test at public boundaries only: API endpoints, CLI output, exported package interfaces, database state, HTTP responses.
