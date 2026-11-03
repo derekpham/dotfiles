@@ -8,8 +8,8 @@
 
 For any session where the user asks to write code in a personal project:
 
-1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
-2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes. Skip the worktree only if the user explicitly overrides.
+1. Run `git fetch origin` to refresh `origin/master` / `origin/main`. Do not check out or pull `master`/`main` in the shared checkout — it switches the branch out from under other sessions and can merge or conflict.
+2. If cwd is not already under `.claude/worktrees/`, enter a new worktree via `EnterWorktree` (it branches from `origin/<default-branch>`) before making changes. Background sessions (`claude agents`) already enforce this. Skip the worktree only if the user explicitly overrides.
 3. Do the work in the worktree. Verify before treating it as done.
 4. Push the worktree branch and open a draft PR with the `pr-create` skill. Do not squash-merge or push to `master`/`main`.
 5. **Paste the PR URL in the reply and stop for review.** Do not mark the PR ready, merge it, or watch CI unless the user asks.
@@ -61,8 +61,8 @@ For any new session where the user asks to write code:
 
 ### Phase 0: Setup
 
-1. Check out `master` or `main` (whichever the repo uses) and run `git pull` to update it.
-2. Enter a new worktree via `EnterWorktree` based on the updated `master`/`main` before making changes.
+1. Run `git fetch origin` to refresh `origin/master` / `origin/main`. Do not check out or pull `master`/`main` in the shared checkout.
+2. If cwd is not already under `.claude/worktrees/`, enter a new worktree via `EnterWorktree` (it branches from `origin/<default-branch>`) before making changes. Background sessions (`claude agents`) already enforce this.
 
 ### Phase 1: Plan + integration tests
 
