@@ -52,7 +52,7 @@ date +%s > "$(git rev-parse --absolute-git-dir)/ci-loop-active"
 
 ## 5. Exit conditions
 
-- **Green:** both unit and integration tests pass with grep evidence → disarm and report. Done.
+- **Green:** unit tests and the PR's integration tests (if any) pass with grep evidence → disarm and report. Done.
 - **Stuck:** if CI cannot be made green without drastic/architectural changes (redesigning a subsystem, changing a public contract or wire format, or work far outside this PR's scope), do NOT make those changes yourself. Create the one-shot release marker, then stop and explain the blocker and your recommended options:
 
   ```bash

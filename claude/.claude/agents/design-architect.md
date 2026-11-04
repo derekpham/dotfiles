@@ -164,7 +164,8 @@ Write the design doc to `docs/<problem-slug>.md` within the repo. If the user sp
 ### PR 1: <Title>
 - **Scope.** <What changes.>
 - **Testable outcome.** <A specific assertion that can be verified after merge.>
-- **Estimated size.** <~N lines, files touched.>
+- **Estimated size.** <~N lines of code excluding tests, generated code, and spec files; files touched.>
+- **Integration tests.** <Which integration tests this PR adds or turns green, or "None" and why.>
 - **Dependencies.** <Prior PRs, external work, config rollouts.>
 - **Risk.** <Low / Medium / High + one phrase.>
 - **Behind a flag?** <Yes/No. If yes, flag name and default.>
@@ -183,12 +184,17 @@ Write the design doc to `docs/<problem-slug>.md` within the repo. If the user sp
 The implementation plan is the most important section — it's what the human will actually review and execute. Rules:
 
 ### Size
-- **Target <1000 lines changed per PR**, including tests.
-- Exceptions allowed (generated code, large migrations, vendor imports) but must be called out and justified. If a PR *must* exceed 1000 lines, say why.
-- If you can't get under 1000 lines, the PR is almost always doing too much. Split it.
+- **Each PR is the smallest possible behavior change.** Size follows from that, not the other way around.
+- **Target ~300–400 lines of code per PR**, excluding tests, generated code, and spec files.
+- Going over 400 is fine when the PR is already the smallest behavioral change — say so in its size estimate. If it's over because it bundles more than one behavior, split it.
+
+### No dead code
+- Every new function, type, endpoint, and field has a caller or reader in the same PR. Don't land a layer in one PR and its first caller in the next.
+- Code that is dark behind a flag is not dead — it's reachable when the flag is on and covered by tests with the flag on.
+- Schema migrations that must precede the code using them (see "Safe sequencing") are the one exception.
 
 ### Each PR must have a defined, testable outcome
-- "Add types and wire plumbing" is weak. "CRDB table `lifecycle_rules` exists with schema X; `INSERT` and `SELECT` covered by unit tests" is strong.
+- "Add types and wire plumbing" is weak. "`GET /lifecycle/{bucket}` returns the bucket's rules from the new `lifecycle_rules` table; covered by unit and integration tests" is strong.
 - The outcome should be assertable in CI or via a manual command. If you can't state how to verify it, the scope is wrong.
 
 ### Safe sequencing
@@ -202,8 +208,8 @@ The implementation plan is the most important section — it's what the human wi
 - State the testable outcome in terms that don't require knowing the rest of the plan.
 
 ### Good PR shapes
-- **"Add data model"** — schema + generated types + CRUD tests. Self-contained.
-- **"Add read path"** — new endpoint or function, returns data, fully tested. No callers yet.
+- **"Add read path end-to-end"** — new endpoint, its handler, and the storage access it needs, fully tested. Every new function has a caller.
+- **"Add write path end-to-end"** — same shape for writes; brings in the data model it needs.
 - **"Wire callers behind a flag"** — integrates the read path; flag-gated; no behavior change when flag off.
 - **"Enable in <env>"** — config change only. Tiny. Revertable instantly.
 - **"Remove legacy path"** — dead-code removal after feature is stable. Last in the sequence.
@@ -225,7 +231,7 @@ Before returning a design, self-check:
 - [ ] Recommendation names the tradeoffs it accepts.
 - [ ] Rollback plan is concrete, not "revert the PRs."
 - [ ] Every PR has a testable outcome.
-- [ ] No PR exceeds 1000 lines without justification.
+- [ ] Each PR is the smallest behavior change, adds no dead code, and any PR over ~400 lines (excluding tests, generated code, spec files) says why.
 - [ ] The first PR is safe to merge on its own and leaves the system healthy.
 - [ ] The last PR doesn't leave dead code behind.
 
