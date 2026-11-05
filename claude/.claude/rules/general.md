@@ -42,8 +42,12 @@ Write a comment only when the *why* is non-obvious and would surprise a future r
 - A workaround for a specific bug, with a link or reason
 - A deliberate deviation from the obvious approach, with the reason
 
+Any comment you do write, in code or schemas, says just enough to identify what the thing is or why it's there, and nothing a small change elsewhere would make wrong. Good: `// The CRDB objects table row of the event.`
+
 Do not write:
 
+- Comments that describe how the code or data will be used — by callers, consumers, or downstream systems ("consumers skip events with no payload they recognize") — unless asked.
+- Details that go stale on the smallest change: enumerated formats, cases, or call sites; config or log field names behind a value; current sizes, limits, or defaults.
 - Comments that restate what the code does — `// increment i` is noise; so is step-narration that echoes the next statement (`// PUT object` above a `PutObject` call, `// First, fetch the user` above the fetch).
 - Comments that reference the current task, ticket, or author.
 - Multi-line preambles on functions whose name and signature already describe the behavior.
