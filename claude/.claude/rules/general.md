@@ -50,6 +50,7 @@ Do not write:
 - Details that go stale on the smallest change: enumerated formats, cases, or call sites; config or log field names behind a value; current sizes, limits, or defaults.
 - Comments that restate what the code does — `// increment i` is noise; so is step-narration that echoes the next statement (`// PUT object` above a `PutObject` call, `// First, fetch the user` above the fetch).
 - Comments that reference the current task, ticket, or author.
+- Comments that reference docs, design proposals, plans, or terms defined only there — no file paths like `docs/…/*.md`, no "see the design doc", no "invariant I1". Docs move and get renamed; the comment rots. State the reason itself in the comment so it stands alone.
 - Multi-line preambles on functions whose name and signature already describe the behavior.
 - Section banners (`// === Helpers ===`).
 

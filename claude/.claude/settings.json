@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'PR created. CI monitoring is OFF and stays off through implementation and review cycles. When all changes are done and reviewed, run /ship to arm the CI-monitoring loop and drive it green.'",
+            "command": "if [ -f \"$HOME/.claude/skills/ship/SKILL.md\" ]; then echo 'PR created. CI monitoring is OFF and stays off through implementation and review cycles. When all changes are done and reviewed, run /ship to arm the CI-monitoring loop and drive it green.'; fi",
             "if": "Bash(gh pr create:*)"
           }
         ]
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/ci-loop-guard.sh\""
+            "command": "if [ -f \"$HOME/.claude/hooks/ci-loop-guard.sh\" ]; then bash \"$HOME/.claude/hooks/ci-loop-guard.sh\"; fi"
           }
         ]
       }

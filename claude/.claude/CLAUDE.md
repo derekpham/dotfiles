@@ -2,18 +2,15 @@
 
 ## Coding workflow — DO THIS FIRST
 
-**Scope:** Applies to every repo when the user asks to write code. Do not trigger it for research, questions, or read-only exploration. A few steps differ by repo type — check `git remote -v`:
-
-- **Roblox repo:** remote points to `github.rbx.com`. Adds a Jira prefix (step 6) and the `/ship` CI loop (Phase 3).
-- **Personal repo:** any other remote. No Jira, no CI monitoring. Has its own push fallback and worktree cleanup (see "Personal repos: pushing and cleanup").
+**Scope:** Applies to every repo when the user asks to write code. Do not trigger it for research, questions, or read-only exploration. Rule files in `~/.claude/rules/` may add steps for specific repos (check `git remote -v`); follow them where they apply. Personal repos (`github.com` remotes) have their own push fallback and worktree cleanup (see "Personal repos: pushing and cleanup").
 
 **DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on `master`/`main` is never acceptable unless the user explicitly says so. Never push `master`/`main`.**
 
 **DO NOT write code directly.** All code and test changes — including small iterative fixes — must be delegated to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks: subtle concurrency, tricky algorithms, large multi-file changes). The main loop must never use Write/Edit on source files. The code-writer agents have their own rules for test coverage and conventions — do not override them. Describe the goal and provide context (relevant files, patterns, constraints), but do NOT enumerate implementation steps or specify test file names.
 
-**Exception — trivial changes.** Typos, comment or doc edits, renames, a constant or config value, or a one-line fix with no new behavior may be edited directly by the main loop, and skip Phase 1 planning. Everything else still applies: worktree, self-review (step 5), `pr-create`, and (Roblox) `/ship`. If the change grows beyond trivial, stop editing and go back to the normal flow.
+**Exception — trivial changes.** Typos, comment or doc edits, renames, a constant or config value, or a one-line fix with no new behavior may be edited directly by the main loop, and skip Phase 1 planning. Everything else still applies: worktree, self-review (step 5), and `pr-create`. If the change grows beyond trivial, stop editing and go back to the normal flow.
 
-**CI monitoring is never automatic.** Writing tests, implementing, pushing, and review cycles never watch CI on their own. In Roblox repos the CI-monitoring loop runs only when the user invokes the `/ship` command (Phase 3), and covers only the current PR. In personal repos, watch CI only if the user asks. Until then, you always stop cleanly for the user to review.
+**CI monitoring is never automatic.** Writing tests, implementing, pushing, and review cycles never watch CI on their own. Watch CI only when the user asks. Until then, you always stop cleanly for the user to review.
 
 ### Phase 0: Setup
 
@@ -28,7 +25,7 @@
 
 ### Phase 2: One PR at a time
 
-Repeat steps 4–7 for each PR in the approved plan, in order. Start the next PR only when the user says so. If the previous PR hasn't merged yet, branch the next one from it.
+Repeat steps 4–6 for each PR in the approved plan, in order. Start the next PR only when the user says so. If the previous PR hasn't merged yet, branch the next one from it.
 
 4. Delegate the PR's scope from the plan to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks). Keep the brief to the goal, constraints, and anything not yet written down; point to the feature doc or saved plan for the rest instead of restating it. The code-writer will follow its own rules for:
    - Writing unit tests for all new/changed exported methods.
@@ -52,40 +49,7 @@ Repeat steps 4–7 for each PR in the approved plan, in order. Start the next PR
    - The PR adds no dead code and stays within the plan's scope for it.
    - Existing integration tests were not modified (unless a wrong assumption was identified).
 
-6. **Roblox repos only:** before creating the first PR, ask the user for a Jira ticket number (e.g. `PROJ-123`). If there is no ticket, use `ADHOC`. Include the ticket in the PR title as a prefix. Reuse it for later PRs in the plan unless the user says otherwise.
-
-7. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft. Paste the PR URL and **stop for review.** Do not mark the PR ready, merge it, or monitor CI — expect one or more review cycles (delegate every fix to a code-writer agent + self-review). In Roblox repos CI monitoring starts only when the user runs `/ship`.
-
-### Phase 3 (Roblox repos only): Ship — CI monitoring loop for a single PR (runs ONLY when the user invokes `/ship`)
-
-> **Enforced by a Stop hook, but only while a loop is *armed*.** Nothing here runs until the user invokes the `/ship` skill. `/ship` arms a `ci-loop-active` marker (an epoch timestamp) in the worktree's git dir. While that marker is live *and* the branch's open PR has pending/failing checks, `~/.claude/hooks/ci-loop-guard.sh` **blocks you from ending your turn** and tells you to resume this loop. The marker — and the block — clears automatically when CI goes green, the PR closes, or the marker goes stale (older than the hook's TTL, a safety net for an abandoned loop). So plain chat, code-improvement discussions, test/implementation/review work, and stale branches are never blocked. The only sanctioned exits while CI is red are the exit condition (all green, step 11) and escalation (step 10). If the user asks you to stop monitoring, remove the marker (`rm -f "$(git rev-parse --absolute-git-dir)/ci-loop-active"`) and stop.
-
-The `/ship` skill walks you through the following; this is the canonical procedure it points to:
-
-8. **Read `.github/workflows/`** to understand which workflows run unit tests and integration tests. CI is a DAG — not all jobs are queued right away. Some workflows:
-   - Depend on other workflows completing first (e.g. `workflow_run`, `needs:`).
-   - Only run on specific path filters.
-   - Are gated behind labels or manual triggers.
-   You must read the repo's workflow files to know which job names to wait for and what triggers them. Don't assume all checks appear instantly or that an empty checks list means "nothing to run."
-
-9. **Monitor** (poll every 3 minutes; re-arm the marker on each push so the stale-timeout budget resets):
-    - Check the PR's CI status via `gh`.
-    - Once CI completes, **verify tests actually ran:**
-      - For unit tests: grep CI logs showing test files were executed.
-      - For integration tests: grep CI logs for specific test function names (e.g. `PASS: TestFeatureX`).
-    - If tests **pass** → show evidence to the user and exit the loop.
-    - If tests **fail:**
-      - If failure is **flaky** (infra timeout, rate limit, unrelated test) → rerun via `gh run rerun --failed`.
-      - If **unit tests** fail → delegate fix to a code-writer agent → self-review (`pr-correctness` + `pr-architecture`) → push → re-arm → restart loop.
-      - If **integration tests** fail → fix only if the test made a wrong assumption; otherwise fix the implementation → self-review → push → re-arm → restart loop.
-    - Every fix goes through a code-writer agent (unless trivial — see the exception above) and self-review — never an unreviewed "quick fix and push."
-
-10. **Escalation — the only sanctioned way to stop while CI is still red.** If all checks cannot be made to pass **without drastic or architectural changes** (redesigning a subsystem, changing a public contract or wire format, or work well outside this PR's scope), do NOT make those changes on your own. Instead:
-    - Create the release marker: `touch "$(git rev-parse --absolute-git-dir)/ci-loop-escalate"` — this lets the Stop hook release you exactly once and stands down the loop. (Run it from inside the worktree.)
-    - Then stop and tell the user precisely what is blocking, what drastic change would be required, and your recommended options.
-    Never silently give up, and never thrash indefinitely.
-
-11. **Exit condition:** Unit tests and the PR's integration tests (if any) pass, with grep evidence shown to the user.
+6. When opening the PR, invoke the `pr-create` skill — it asks the human for the *why*, drafts a `## Why`-first body, and creates the PR as a draft. Paste the PR URL and **stop for review.** Do not mark the PR ready, merge it, or monitor CI — expect one or more review cycles (delegate every fix to a code-writer agent + self-review).
 
 ### Rules that apply across all phases
 
@@ -94,13 +58,6 @@ The `/ship` skill walks you through the following; this is the canonical procedu
 - All code, in every phase (implementation, integration tests, review fixes, CI-failure fixes), goes through a code-writer agent (except trivial changes) and follows the rules in `~/.claude/rules/`.
 - One-off subagents you launch yourself (security reviews, false-positive checks, lookups) run with `model: sonnet`, unless the change touches auth, storage, or crypto.
 - Each repo's `CLAUDE.md` keeps a short code map (top-level areas and key files, one line each) so agents spend less time exploring. Update it in the PR that adds or moves a key file.
-
-### CI-loop marker files (quick reference)
-
-Both live in the worktree's git dir (`$(git rev-parse --absolute-git-dir)`):
-
-- `ci-loop-active` — **armed by `/ship`.** Contains an epoch timestamp; its presence is what makes the Stop hook enforce the loop. Re-armed on each push during the loop (resets the stale timeout). Cleared automatically when CI goes green, the PR closes, or it goes stale. Delete it to stop monitoring and just discuss the code.
-- `ci-loop-escalate` — **one-shot.** Releases the Stop hook a single time when a PR can't go green without drastic changes; also stands down the active loop. The hook consumes (deletes) it.
 
 ### Personal repos: pushing and cleanup
 
