@@ -1,6 +1,6 @@
 # General coding rules (language-agnostic)
 
-These rules apply to every language. Per-language specifics live alongside this file in `go.md`, `python.md`, `typescript.md`. Both the `code-writer` / `code-writer-hard` agents and the `pr-correctness` reviewer read these, so the writer and the reviewer enforce the same list. Add new cross-language rules here.
+These rules apply to every language. Per-language specifics live alongside this file in `go.md`, `python.md`, `typescript.md`, `android.md`. Both the `code-writer` / `code-writer-hard` agents and the `pr-correctness` reviewer read these, so the writer and the reviewer enforce the same list. Add new cross-language rules here.
 
 ## Don't over-abstract
 

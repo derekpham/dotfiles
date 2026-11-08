@@ -60,6 +60,10 @@ Do not produce options or a plan in this mode.
 
 You have enough to propose. Your output is a full design doc plus PR plan. See "Design output format" below.
 
+### Mode 3: Item plan (one item of an already-designed feature)
+
+When the task is one checklist item of a feature whose design already exists (a feature doc with decisions, or an earlier plan), skip the full design doc. Return about one page: the key decisions with a line of reasoning each, the PR breakdown (scope, files, tests, phone/manual check), risks, and open questions. Don't restate the context you were given or describe code you only read. Framing still applies: if a data-volume or UX question would change the approach, ask it before planning.
+
 ## Framing process
 
 When a problem lands:
@@ -81,6 +85,8 @@ A question is critical if the answer would cause you to pick a different approac
 - "What's the target QPS?" — changes between sync and async, between in-memory and durable queue.
 - "Does this need to work for existing buckets or only new ones?" — changes migration plan dramatically.
 - "Is there a deadline tied to a dependent system?" — changes whether you can do a phased rollout.
+- "How many items will this list hold, now and in a year?" — changes load-everything vs. paging vs. a local cache.
+- "Which app should this feel like?" — a UX reference (e.g. "like Google Photos") changes layout, loading, and navigation choices.
 
 Non-critical (proceed with stated assumption):
 - Exact naming of a new column.

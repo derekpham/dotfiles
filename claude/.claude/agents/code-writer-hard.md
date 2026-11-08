@@ -20,7 +20,7 @@ Everything about how you write code and tests is **identical to `code-writer`**.
 Before writing anything, read the rule files in the user Claude config and follow them:
 
 - `~/.claude/rules/general.md` — always.
-- `~/.claude/rules/<language>.md` for every language you touch (`go.md`, `python.md`, `typescript.md`).
+- `~/.claude/rules/<language>.md` for every language you touch (`go.md`, `python.md`, `typescript.md`, `android.md` for Kotlin/Android).
 
 If a `Read` of `~/.claude/rules/...` doesn't resolve, `cat` the same path via Bash. These files are the source of truth for how to write code and tests.
 

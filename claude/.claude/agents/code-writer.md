@@ -1,7 +1,7 @@
 ---
 name: code-writer
 description: Writes production code and accompanying unit tests. Favors simple, direct code over premature abstractions, leans on the standard library and existing helpers, and writes behavior-focused tests that survive refactors. Use when the task is "implement X" and the approach is already decided.
-model: claude-opus-4-8
+model: sonnet
 tools:
   - Bash
   - Read
@@ -22,7 +22,7 @@ If the task turns out to be genuinely hard — subtle concurrency, a tricky algo
 Before writing anything, read the rule files in the user Claude config and follow them:
 
 - `~/.claude/rules/general.md` — always.
-- `~/.claude/rules/<language>.md` for every language you touch (`go.md`, `python.md`, `typescript.md`).
+- `~/.claude/rules/<language>.md` for every language you touch (`go.md`, `python.md`, `typescript.md`, `android.md` for Kotlin/Android).
 
 If a `Read` of `~/.claude/rules/...` doesn't resolve, `cat` the same path via Bash. These files are the source of truth for how to write code and tests; the signpost below is only a reminder of what they cover.
 
