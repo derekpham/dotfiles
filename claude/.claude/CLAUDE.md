@@ -24,12 +24,13 @@
 
 3. **Plan the work with the `design-architect` agent.** Even if the user says "implement X," plan first. Give it the task and context. It sets the overall direction for the whole task, then breaks it into an ordered sequence of PRs following its "PR breakdown rules" (smallest behavior change per PR, no dead code, ~300–400 lines excluding tests, generated code, and spec files). For each PR the plan also states whether it needs integration tests: check whether existing integration tests cover the area, and if the feature area has none, ask the user whether they want them. Integration tests land in the PR whose behavior they cover, not up front.
    - Present the plan to the user for approval before proceeding.
+   - Once approved, save the plan where a fresh session can pick it up: as checklist items and decisions in the repo's feature doc if one exists, otherwise in memory. Then suggest `/clear` before implementing. Run one session per plan item (sub-feature), and suggest `/clear` again whenever review rounds have made a session long — the feature doc and memory carry the context forward.
 
 ### Phase 2: One PR at a time
 
 Repeat steps 4–7 for each PR in the approved plan, in order. Start the next PR only when the user says so. If the previous PR hasn't merged yet, branch the next one from it.
 
-4. Delegate the PR's scope from the plan to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks). The code-writer will follow its own rules for:
+4. Delegate the PR's scope from the plan to the `code-writer` agent (or `code-writer-hard` for genuinely hard tasks). Keep the brief to the goal, constraints, and anything not yet written down; point to the feature doc or saved plan for the rest instead of restating it. The code-writer will follow its own rules for:
    - Writing unit tests for all new/changed exported methods.
    - Full branch coverage of new code paths (unless awkward to achieve — e.g. platform-specific error paths, unreachable defensive branches).
    - Behavior-based assertions, not implementation-detail assertions.
@@ -39,7 +40,12 @@ Repeat steps 4–7 for each PR in the approved plan, in order. Start the next PR
      - Tests **must not break** on code refactors or architecture refactors (unless the requested change is itself architectural).
    - Integration tests from earlier PRs must continue to pass without modification (unless they made a wrong assumption).
 
-5. **Self-review before pushing.** Run `pr-correctness` and `pr-architecture` subagents on the diff. Both must verify:
+5. **Self-review before pushing.** Scale the review to the change:
+   - **Docs, config, or assets only** (no code): review the diff yourself; no subagents.
+   - **Under ~150 changed lines, not touching auth, storage, crypto, network, or concurrency:** run `pr-correctness` alone; it also covers the architecture basics.
+   - **Everything else:** run both `pr-correctness` and `pr-architecture`.
+
+   The reviews must verify:
    - All new exported methods have unit tests.
    - Coverage of new code paths is complete (flag gaps explicitly).
    - Unit tests assert on behavior, not implementation.
@@ -86,6 +92,8 @@ The `/ship` skill walks you through the following; this is the canonical procedu
 - Skip the worktree step only if the user explicitly overrides.
 - Every fix iteration goes through self-review before pushing — no "quick fix and push" shortcuts.
 - All code, in every phase (implementation, integration tests, review fixes, CI-failure fixes), goes through a code-writer agent (except trivial changes) and follows the rules in `~/.claude/rules/`.
+- One-off subagents you launch yourself (security reviews, false-positive checks, lookups) run with `model: sonnet`, unless the change touches auth, storage, or crypto.
+- Each repo's `CLAUDE.md` keeps a short code map (top-level areas and key files, one line each) so agents spend less time exploring. Update it in the PR that adds or moves a key file.
 
 ### CI-loop marker files (quick reference)
 
@@ -132,7 +140,7 @@ worktree intact.
 All coding and test rules live in `~/.claude/rules/`:
 
 - `general.md` — language-agnostic rules (abstraction, comments, error handling, scope, test design, and "no over-defensive constructor checks").
-- `go.md`, `python.md`, `typescript.md` — per-language specifics (standard-library preferences, test idioms, common pitfalls; e.g. no `ctrl.Finish()` in Go gomock tests).
+- `go.md`, `python.md`, `typescript.md`, `android.md` (Kotlin/Android) — per-language specifics (standard-library preferences, test idioms, common pitfalls; e.g. no `ctrl.Finish()` in Go gomock tests).
 
 The `code-writer` / `code-writer-hard` and `pr-correctness` agents read these before working, so the writer and the reviewer enforce the same list. **Add new coding rules there — one place, no drift.**
 
