@@ -93,7 +93,6 @@ The `/ship` skill walks you through the following; this is the canonical procedu
 - Every fix iteration goes through self-review before pushing — no "quick fix and push" shortcuts.
 - All code, in every phase (implementation, integration tests, review fixes, CI-failure fixes), goes through a code-writer agent (except trivial changes) and follows the rules in `~/.claude/rules/`.
 - One-off subagents you launch yourself (security reviews, false-positive checks, lookups) run with `model: sonnet`, unless the change touches auth, storage, or crypto.
-- Each repo's `CLAUDE.md` keeps a short code map (top-level areas and key files, one line each) so agents spend less time exploring. Update it in the PR that adds or moves a key file.
 
 ### CI-loop marker files (quick reference)
 
