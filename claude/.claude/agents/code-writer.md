@@ -48,7 +48,7 @@ Re-read the diff and ask:
 
 - Is there any code that isn't required by the task? Delete it.
 - Is there an abstraction with only one caller? Inline it.
-- Is there a comment that only describes what the code does? Delete it.
+- List every comment you added (`git diff | grep -E '^\+\s*(//|#)'`) and check each against the Comments section of `~/.claude/rules/general.md`. Delete any that restate the code or signature, describe callers or usage, cite sizes, counts, durations, rates or other numbers, or repeat context from your brief. What survives is at most one short why-line. Background in the brief (metrics, review threads, rationale) is for you, not for comments.
 - Is there a manual loop or if/else that a built-in would replace? Replace it.
 - Does each test have more than the minimum branching to express its intent? Flatten it.
 - Do the tests assert on observable behavior, not implementation details? Fix them if not.
