@@ -47,13 +47,9 @@ If they don't add anything, omit them. The `## Why` and `## How` are the section
 
 ## 4. Always create as a draft
 
-Push the current branch first with `git push -u origin HEAD`. Claude Code's
-worktree isolation refuses git commands that set `GIT_CONFIG_GLOBAL` or redirect
-into the git dir, so keep git invocations plain and run them one at a time.
-
-Only if that SSH push fails outside a Claude Code worktree, for a personal
-repository whose `nameWithOwner` reported by `gh repo view` starts with
-`derekpham/`, resolve the HTTPS URL and push over it instead:
+Push the current branch first. For a personal repository (`nameWithOwner` from
+`gh repo view` starts with `derekpham/`) outside a Claude Code worktree, always
+push over HTTPS with `gh` as the credential helper; don't try SSH first:
 
 ```bash
 repo_url=$(gh repo view --json url --jq .url)
@@ -63,7 +59,11 @@ GIT_CONFIG_GLOBAL=/dev/null git \
   push "${repo_url}.git" "HEAD:refs/heads/${branch}"
 ```
 
-This HTTPS rule is only for personal repositories. Leave the existing Roblox
+This push sets no upstream, so pass `--head "$branch"` to `gh pr create`.
+
+Inside a Claude Code worktree, isolation refuses git commands that set
+`GIT_CONFIG_GLOBAL` or redirect into the git dir, so push with plain
+`git push -u origin HEAD`, one git command at a time. Leave the existing Roblox
 push workflow unchanged.
 
 Use `gh pr create --draft …`. Do not ask permission to draft — just draft it. The user marks the PR ready for review themselves when they're ready.

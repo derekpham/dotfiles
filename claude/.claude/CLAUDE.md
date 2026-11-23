@@ -2,7 +2,7 @@
 
 ## Coding workflow — DO THIS FIRST
 
-**Scope:** Applies to every repo when the user asks to write code. Do not trigger it for research, questions, or read-only exploration. Rule files in `~/.claude/rules/` may add steps for specific repos (check `git remote -v`); follow them where they apply. Personal repos (`github.com` remotes) have their own push fallback and worktree cleanup (see "Personal repos: pushing and cleanup").
+**Scope:** Applies to every repo when the user asks to write code. Do not trigger it for research, questions, or read-only exploration. Rule files in `~/.claude/rules/` may add steps for specific repos (check `git remote -v`); follow them where they apply. Personal repos (`github.com` remotes) have their own push method and worktree cleanup (see "Personal repos: pushing and cleanup").
 
 **DO NOT edit, write, or create any file before completing steps 1–2. DO NOT skip the worktree — editing files on `master`/`main` is never acceptable unless the user explicitly says so. Never push `master`/`main`.**
 
@@ -62,13 +62,12 @@ Repeat steps 4–6 for each PR in the approved plan, in order. Start the next PR
 
 ### Personal repos: pushing and cleanup
 
-Push with `git push -u origin HEAD`. Claude Code's worktree isolation refuses
-git commands that set `GIT_CONFIG_GLOBAL` or redirect into the git dir, so keep
-git invocations plain and run them one at a time.
-
-**SSH git often fails in the Cursor agent sandbox** (`kex_exchange_identification`, `banner exchange`, `Network is down`) even while the user's own terminal can pull/push and `gh` / HTTPS still work. Do not tell the user to push, and do not treat a failed `git fetch` as proof that `origin/main` is current.
-
-Only when SSH fails outside a Claude Code worktree: a global `url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain HTTPS remotes back over SSH, so disable the global rewrite for the command and use `gh` as Git's credential helper:
+Outside a Claude Code worktree, always push over HTTPS with `gh` as Git's
+credential helper; don't try SSH first. SSH git often fails in agent sandboxes
+(`kex_exchange_identification`, `banner exchange`, `Network is down`) even while
+the user's own terminal can push. A global
+`url.ssh://git@github.com/.insteadOf https://github.com/` rewrite sends plain
+HTTPS remotes back over SSH, so disable the global config for the command:
 
 ```bash
 repo_url=$(gh repo view --json url --jq .url)
@@ -77,6 +76,13 @@ GIT_CONFIG_GLOBAL=/dev/null git \
   -c credential.helper='!gh auth git-credential' \
   push "${repo_url}.git" "HEAD:refs/heads/${branch}"
 ```
+
+Inside a Claude Code worktree, isolation refuses git commands that set
+`GIT_CONFIG_GLOBAL` or redirect into the git dir, so there push with plain
+`git push -u origin HEAD`, one git command at a time.
+
+Do not tell the user to push, and do not treat a failed SSH `git fetch` as
+proof that `origin/main` is current.
 
 Then create the draft PR with `gh` as usual. If the user's statement about Git
 state contradicts local refs, refresh them over HTTPS with the same credential

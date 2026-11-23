@@ -10,7 +10,7 @@
       "mcp__mcp-gateway-mosaic_mds",
       "mcp__mcp-gateway-logs"
     ],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "auto"
   },
   "model": "claude-opus-5-5[1m]",
   "hooks": {
